@@ -39,7 +39,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
             onClick={() => onNavigate('home')}
           >
             <img 
-              src="/src/assets/quantuniversity-logo.jpg" 
+              src="/src/assets/logos/quantuniversity-logo.jpg" 
               alt="QuantUniversity Logo" 
               className="h-14 object-contain transition-transform group-hover:scale-105"
             />
