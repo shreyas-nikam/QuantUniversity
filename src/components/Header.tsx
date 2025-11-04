@@ -38,9 +38,11 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => onNavigate('home')}
           >
-            <div className="bg-[#007CBF] p-2 rounded-lg transition-transform group-hover:scale-105">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
+            <img 
+              src="/src/assets/quantuniversity-logo.jpg" 
+              alt="QuantUniversity Logo" 
+              className="h-14 object-contain transition-transform group-hover:scale-105"
+            />
             <div>
               <span className="text-xl font-bold text-gray-900">QuantUniversity</span>
               <p className="text-xs text-gray-500">AI & Risk Management Education</p>
@@ -48,7 +50,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-end mr-4">
             {navItems.map((item) => (
               item.hasDropdown ? (
                 <div
@@ -59,14 +61,14 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 >
                   <button
                     onClick={() => onNavigate(item.id)}
-                    className={`px-4 py-2 rounded-md transition-colors flex items-center gap-1 ${
+                    className={`px-2 xl:px-3 py-2 rounded-md transition-colors flex items-center gap-1 text-sm ${
                       currentPage === item.id || certificatePrograms.some(p => p.id === currentPage)
                         ? 'text-[#007CBF] bg-[#007CBF]/5'
                         : 'text-gray-700 hover:text-[#007CBF] hover:bg-gray-50'
                     }`}
                   >
-                    {item.name}
-                    <ChevronDown className={`h-4 w-4 transition-transform ${certificateDropdownOpen ? 'rotate-180' : ''}`} />
+                    <span className="whitespace-nowrap">{item.name}</span>
+                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${certificateDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {/* Dropdown Menu */}
@@ -111,7 +113,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 <button
                   key={item.id}
                   onClick={() => onNavigate(item.id)}
-                  className={`px-4 py-2 rounded-md transition-colors ${
+                  className={`px-2 xl:px-3 py-2 rounded-md transition-colors text-sm whitespace-nowrap ${
                     currentPage === item.id
                       ? 'text-[#007CBF] bg-[#007CBF]/5'
                       : 'text-gray-700 hover:text-[#007CBF] hover:bg-gray-50'
@@ -123,9 +125,9 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <Button 
-              className="bg-[#007CBF] hover:bg-[#006A9C] text-white px-6 rounded-lg transition-all hover-lift"
+              className="bg-[#007CBF] hover:bg-[#006A9C] text-white px-4 xl:px-6 rounded-lg transition-all hover-lift text-sm"
               onClick={() => onNavigate('courses')}
             >
               Enroll Now
