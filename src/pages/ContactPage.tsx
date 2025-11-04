@@ -19,13 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from '../components/ui/breadcrumb';
 import { motion } from 'motion/react';
 import { SEO } from '../components/SEO';
@@ -40,7 +40,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
   const [showCalendly, setShowCalendly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -86,7 +86,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
       formDataToSend.append('industry', formData.industry);
       formDataToSend.append('receive_updates', formData.consent.toString());
 
-      const response = await fetch('http://localhost:8003/post_contact_interest', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/post_contact_interest`, {
         method: 'POST',
         body: formDataToSend,
       });
@@ -108,7 +108,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
         message: '',
         consent: false
       });
-      
+
       // Show success message
       toast.success('Thank you for your message!', {
         description: "We'll get back to you within 24 hours.",
@@ -253,18 +253,18 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
 
   return (
     <div className="bg-white min-h-screen">
-      <SEO 
+      <SEO
         pageKey="contact"
         structuredData={[breadcrumbSchema, faqSchema]}
       />
-      
+
       {/* Breadcrumb Navigation */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink 
+                <BreadcrumbLink
                   onClick={() => onNavigate?.('home')}
                   className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
                 >
@@ -314,7 +314,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   {/* Glow effect on hover */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${method.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                   <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#007CBF]/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
+
                   <CardContent className="p-8 text-center relative z-10">
                     <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
                       {method.icon}
@@ -349,14 +349,14 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -8 }}
               >
-                <Card 
+                <Card
                   className="border-2 hover:border-[#007CBF] transition-all cursor-pointer relative overflow-hidden group h-full"
                   onClick={() => setSelectedInquiryType(type.title)}
                 >
                   {/* Hover glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-[#007CBF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#007CBF]/10 rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
+
                   <CardContent className="p-6 relative z-10">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="text-4xl transform group-hover:scale-110 transition-transform duration-300">
@@ -394,7 +394,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Name *
                     </label>
-                    <Input 
+                    <Input
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
@@ -407,7 +407,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email *
                     </label>
-                    <Input 
+                    <Input
                       name="email"
                       type="email"
                       value={formData.email}
@@ -424,7 +424,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Organization
                     </label>
-                    <Input 
+                    <Input
                       name="organization"
                       value={formData.organization}
                       onChange={handleInputChange}
@@ -436,7 +436,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Phone
                     </label>
-                    <Input 
+                    <Input
                       name="phone"
                       type="tel"
                       value={formData.phone}
@@ -452,8 +452,8 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       I'm interested in... *
                     </label>
-                    <Select 
-                      required 
+                    <Select
+                      required
                       value={formData.inquiryType}
                       onValueChange={handleSelectChange('inquiryType')}
                     >
@@ -470,7 +470,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Which course interests you?
@@ -518,7 +518,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Message *
                   </label>
-                  <Textarea 
+                  <Textarea
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
@@ -531,8 +531,8 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
 
                 <div className="bg-[#F9FAFB] rounded-lg p-4 border border-gray-200">
                   <label className="flex items-start gap-3 cursor-pointer">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       name="consent"
                       checked={formData.consent}
                       onChange={handleInputChange}
@@ -545,7 +545,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   </label>
                 </div>
 
-                <Button 
+                <Button
                   type="submit"
                   size="lg"
                   className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -647,11 +647,11 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                       animate={{ opacity: 0, scale: 2 }}
                       transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
                     />
-                    
+
                     {/* Pin */}
                     <div className="relative group cursor-pointer">
                       <div className="w-4 h-4 bg-[#007CBF] rounded-full border-2 border-white shadow-lg group-hover:scale-150 transition-transform duration-300"></div>
-                      
+
                       {/* Tooltip */}
                       <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                         <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-xl">
@@ -672,7 +672,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-8 grid md:grid-cols-3 gap-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -785,7 +785,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <p className="text-gray-600 text-sm mb-4">
                       Book a free 15-minute consultation with our team to discuss your specific needs and get personalized recommendations.
                     </p>
-                    <Button 
+                    <Button
                       className="bg-[#007CBF] hover:bg-[#006A9C] text-white"
                       onClick={() => setShowCalendly(true)}
                       aria-label="Open calendar to book a free 15-minute consultation call with QuantUniversity team"
@@ -826,8 +826,8 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   <p className="text-white/80 text-sm mb-4">
                     Explore 20+ expert-led programs in AI, ML, and finance
                   </p>
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="w-full bg-white text-[#007CBF] hover:bg-gray-100"
                   >
                     View Courses
@@ -851,8 +851,8 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   <p className="text-white/80 text-sm mb-4">
                     Get personalized recommendations from our experts
                   </p>
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="w-full border-2 border-white text-white hover:bg-white/10"
                     variant="outline"
                   >
@@ -875,8 +875,8 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-gray-900">Schedule Your Consultation</h4>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => setShowCalendly(false)}
                     >

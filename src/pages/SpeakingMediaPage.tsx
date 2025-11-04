@@ -8,13 +8,13 @@ import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from '../components/ui/breadcrumb';
 import { ScrollableCarousel } from '../components/ScrollableCarousel';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
@@ -38,7 +38,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -94,7 +94,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
       if (formData.additionalDetails) formDataToSend.append('additional_details', formData.additionalDetails);
       if (formData.eventRfp) formDataToSend.append('event_rfp', formData.eventRfp);
 
-      const response = await fetch('http://localhost:8003/post_speaking_interest', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/post_speaking_interest`, {
         method: 'POST',
         body: formDataToSend,
       });
@@ -117,7 +117,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
         additionalDetails: '',
         eventRfp: null
       });
-      
+
       // Show success message
       toast.success('Thank you for your booking request!', {
         description: "We'll get back to you within 24 hours.",
@@ -295,8 +295,8 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
 
   const [activeFilter, setActiveFilter] = useState('all');
 
-  const filteredMedia = activeFilter === 'all' 
-    ? mediaItems 
+  const filteredMedia = activeFilter === 'all'
+    ? mediaItems
     : mediaItems.filter(item => item.type === activeFilter);
 
   // FAQs for structured data
@@ -331,18 +331,18 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
 
   return (
     <div className="bg-white min-h-screen">
-      <SEO 
+      <SEO
         pageKey="speaking-media"
         structuredData={[breadcrumbSchema, generateFAQSchema(faqs)]}
       />
-      
+
       {/* Breadcrumb Navigation */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink 
+                <BreadcrumbLink
                   onClick={() => onNavigate?.('home')}
                   className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
                 >
@@ -383,23 +383,23 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
               Sri has inspired thousands across the globe — from Bank of America and the Milken Institute to CFA societies, PRMIA forums, and innovation summits. Bring world-class expertise to your next event.
             </p>
             <div className="flex flex-wrap gap-4 mb-12">
-              <button 
+              <button
                 onClick={() => setShowBookingForm(true)}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white text-[#007CBF] hover:bg-gray-100 px-8 h-14 text-lg font-medium transition-colors cursor-pointer"
               >
                 <Calendar className="h-5 w-5" />
                 Book Sri to Speak
               </button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-[#007CBF] px-8 rounded-lg h-14 text-lg"
               >
                 <Play className="mr-2 h-5 w-5" />
                 Watch Sample Talk
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-[#007CBF] px-8 rounded-lg h-14 text-lg"
               >
@@ -501,7 +501,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                 transition={{ delay: idx * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card 
+                <Card
                   className="border-2 border-gray-200 hover:border-[#007CBF] transition-all hover-lift cursor-pointer h-full"
                   onClick={() => setSelectedTopic(topic.title)}
                 >
@@ -523,7 +523,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
           </div>
 
           <div className="text-center mt-12">
-            <Button 
+            <Button
               size="lg"
               variant="outline"
               className="border-2 border-[#007CBF] text-[#007CBF] hover:bg-[#007CBF] hover:text-white"
@@ -554,7 +554,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
               <Button
                 key={filter.value}
                 variant={activeFilter === filter.value ? 'default' : 'outline'}
-                className={activeFilter === filter.value 
+                className={activeFilter === filter.value
                   ? 'bg-[#007CBF] text-white hover:bg-[#006A9C]'
                   : 'border-2 border-gray-300 text-gray-700 hover:border-[#007CBF] hover:text-[#007CBF]'
                 }
@@ -679,7 +679,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Your Name *
                     </label>
-                    <Input 
+                    <Input
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
@@ -692,7 +692,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Organization *
                     </label>
-                    <Input 
+                    <Input
                       name="organization"
                       value={formData.organization}
                       onChange={handleInputChange}
@@ -708,7 +708,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Email *
                     </label>
-                    <Input 
+                    <Input
                       name="email"
                       type="email"
                       value={formData.email}
@@ -722,7 +722,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Phone
                     </label>
-                    <Input 
+                    <Input
                       name="phone"
                       type="tel"
                       value={formData.phone}
@@ -738,7 +738,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Event Type *
                     </label>
-                    <Select 
+                    <Select
                       required
                       value={formData.eventType}
                       onValueChange={handleSelectChange('eventType')}
@@ -761,7 +761,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Preferred Date
                     </label>
-                    <Input 
+                    <Input
                       name="preferredDate"
                       type="date"
                       value={formData.preferredDate}
@@ -816,7 +816,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                   <label className="block text-sm text-gray-700 mb-2">
                     Additional Details
                   </label>
-                  <Textarea 
+                  <Textarea
                     name="additionalDetails"
                     value={formData.additionalDetails}
                     onChange={handleInputChange}
@@ -831,7 +831,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     Upload Event RFP (Optional)
                   </label>
                   <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#007CBF] transition-colors cursor-pointer block">
-                    <input 
+                    <input
                       type="file"
                       name="eventRfp"
                       onChange={handleFileChange}
@@ -865,7 +865,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                 )}
 
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     type="submit"
                     size="lg"
                     className="flex-1 bg-[#007CBF] hover:bg-[#006A9C] text-white h-12 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -923,7 +923,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
               </div>
               <div>
                 <div className="flex gap-3">
-                  <Input 
+                  <Input
                     type="email"
                     placeholder="Your email address"
                     className="border-white/20 bg-white/10 text-white placeholder:text-white/60"
