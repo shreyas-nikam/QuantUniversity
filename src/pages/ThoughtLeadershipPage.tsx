@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { Calendar, Clock, ArrowRight, Download, BookOpen, TrendingUp, Star, User, Gift, Sparkles, Eye } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, Download, BookOpen, TrendingUp, Star, User, Gift, Sparkles, Eye, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { articles, getFeaturedArticles } from '../data/articles';
 import { ArticleCard } from '../components/ArticleCard';
+import { SEO } from '../components/SEO';
+import { generateBreadcrumbSchema } from '../data/seo';
 
 interface ThoughtLeadershipPageProps {
   onNavigate?: (page: string) => void;
@@ -158,8 +168,18 @@ export function ThoughtLeadershipPage({ onNavigate }: ThoughtLeadershipPageProps
     { name: 'MLOps', count: 98, color: 'indigo' },
   ];
 
+  // Structured data
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Insights', url: '/insights' }
+  ]);
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        pageKey="thought-leadership"
+        structuredData={breadcrumbSchema}
+      />
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-[#007CBF] to-[#006A9C]">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
@@ -172,6 +192,31 @@ export function ThoughtLeadershipPage({ onNavigate }: ThoughtLeadershipPageProps
               Weekly insights on AI, risk management, and financial innovation. Join 5,000+ professionals staying ahead of the curve.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">Thought Leadership</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </section>
 
@@ -199,8 +244,9 @@ export function ThoughtLeadershipPage({ onNavigate }: ThoughtLeadershipPageProps
                         <div className="md:col-span-2 relative h-64 md:h-auto group">
                           <ImageWithFallback
                             src={post.image}
-                            alt={post.title}
+                            alt={`Featured image for article: ${post.title} - ${post.category}`}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
                           />
                           {post.featured && (
                             <div className="absolute top-4 left-4">
@@ -220,8 +266,9 @@ export function ThoughtLeadershipPage({ onNavigate }: ThoughtLeadershipPageProps
                             <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-[#007CBF]">
                               <ImageWithFallback
                                 src={post.authorImage}
-                                alt={post.author}
+                                alt={`Profile photo of ${post.author}, author of ${post.title}`}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
                               />
                             </div>
                             <span className="text-xs text-gray-900 font-medium pr-1">{post.author.split(',')[0]}</span>

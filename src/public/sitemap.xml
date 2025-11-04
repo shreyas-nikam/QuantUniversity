@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://www.quantuniversity.com/</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Courses -->
+  <url>
+    <loc>https://www.quantuniversity.com/courses</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Machine Learning Course -->
+  <url>
+    <loc>https://www.quantuniversity.com/courses/machine-learning-trading-finance</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Introduction to Generative AI Course -->
+  <url>
+    <loc>https://www.quantuniversity.com/courses/introduction-generative-ai</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Certificate Programs -->
+  <url>
+    <loc>https://www.quantuniversity.com/certificate-programs</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Responsible GenAI Certificate -->
+  <url>
+    <loc>https://www.quantuniversity.com/certificates/responsible-genai</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- AI Risk Management Certificate -->
+  <url>
+    <loc>https://www.quantuniversity.com/certificates/ai-risk-management</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Quant Finance Foundations Certificate -->
+  <url>
+    <loc>https://www.quantuniversity.com/certificates/quant-finance-foundations</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- How You Learn -->
+  <url>
+    <loc>https://www.quantuniversity.com/how-you-learn</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Enterprise -->
+  <url>
+    <loc>https://www.quantuniversity.com/enterprise</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Insights/Blog -->
+  <url>
+    <loc>https://www.quantuniversity.com/insights</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Blog Articles - Add individual articles here -->
+  <url>
+    <loc>https://www.quantuniversity.com/insights/beyond-vibe-coding</loc>
+    <lastmod>2025-10-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Speaking & Media -->
+  <url>
+    <loc>https://www.quantuniversity.com/speaking</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- About -->
+  <url>
+    <loc>https://www.quantuniversity.com/about</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Contact -->
+  <url>
+    <loc>https://www.quantuniversity.com/contact</loc>
+    <lastmod>2025-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Add more URLs as needed -->
+  
+</urlset>

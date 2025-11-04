@@ -6,7 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
@@ -20,6 +20,10 @@ import {
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
 import { courses, certificates, getCertificatesForCourse } from '../data/coursesAndCertificates';
+import { SEO } from '../components/SEO';
+import { generateCourseSchema, generateFAQSchema, generateBreadcrumbSchema } from '../data/seo';
+import { useAnalytics } from '../components/AnalyticsProvider';
+import { trackingIds } from '../data/analytics';
 
 interface IntroGenAICourseDetailPageProps {
   onNavigate: (page: string) => void;
@@ -28,6 +32,7 @@ interface IntroGenAICourseDetailPageProps {
 export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetailPageProps) {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isCertBoxOpen, setIsCertBoxOpen] = useState(true);
+  const analytics = useAnalytics();
 
   const course = courses['intro-genai'];
   const courseCertificates = getCertificatesForCourse(course.id);
@@ -249,9 +254,47 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
     }
   ];
 
+  // Prepare FAQ data for schema
+  const faqSchemaData = faqs.map(faq => ({
+    question: faq.question,
+    answer: faq.answer
+  }));
+
   return (
-    <div className="bg-white min-h-screen">
-      {/* Breadcrumb Navigation */}
+    <>
+      <SEO 
+        customSEO={{
+          title: `${course.title} | QuantUniversity`,
+          description: course.detailedDescription,
+          keywords: ['generative AI course', 'LLM training', 'GPT-4', 'transformer architecture', 'AI in finance', 'prompt engineering'],
+          ogImage: course.heroImage,
+          canonicalUrl: `/courses/${course.id}`
+        }}
+        structuredData={[
+          generateCourseSchema({
+            title: course.title,
+            description: course.detailedDescription,
+            instructor: course.instructor,
+            price: course.price,
+            rating: course.rating,
+            reviewCount: Math.round(course.students * 0.25),
+            duration: course.duration,
+            level: course.level,
+            url: `https://www.quantuniversity.com/courses/${course.id}`,
+            imageUrl: course.heroImage
+          }),
+          generateFAQSchema(faqSchemaData),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://www.quantuniversity.com' },
+            { name: 'Certificate Programs', url: 'https://www.quantuniversity.com/certificates' },
+            { name: certificate?.title || 'Responsible GenAI', url: 'https://www.quantuniversity.com/certificates/responsible-genai' },
+            { name: course.title, url: `https://www.quantuniversity.com/courses/${course.id}` }
+          ])
+        ]}
+      />
+      
+      <div className="bg-white min-h-screen">
+        {/* Breadcrumb Navigation */}
       <div className="bg-gray-50 border-b">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
           <Breadcrumb>
@@ -292,7 +335,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
       </div>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-purple-900 py-16">
+      <section className="relative bg-gradient-to-br from-[#007CBF] via-[#006A9C] to-[#005580] py-16">
         <div className="absolute inset-0 opacity-20">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1677442136019-21780ecad995?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwZXRoaWNzfGVufDF8fHx8MTc2MjExNjc1N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -313,7 +356,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
 
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <Badge className="mb-4 bg-purple-600 text-white">
+              <Badge className="mb-4 bg-[#007CBF] text-white">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Popular Course
               </Badge>
@@ -344,7 +387,12 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
                   <Button 
                     size="lg" 
                     variant="outline" 
-                    className="border-2 border-white text-white hover:bg-white hover:text-purple-900 mb-8"
+                    className="border-2 border-white text-white hover:bg-white hover:text-[#007CBF] mb-8"
+                    data-tracking-id={trackingIds.courseDetail.previewVideo}
+                    onClick={() => {
+                      analytics.trackVideoPlay(course.id, course.title);
+                    }}
+                    aria-label="Watch course preview video"
                   >
                     <Play className="mr-2 h-5 w-5" />
                     Watch Course Preview
@@ -353,6 +401,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
                 <DialogContent className="max-w-4xl">
                   <DialogHeader>
                     <DialogTitle>Course Preview</DialogTitle>
+                    <DialogDescription>Watch a sample intro lecture on GenAI fundamentals</DialogDescription>
                   </DialogHeader>
                   <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -367,7 +416,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
               </Dialog>
 
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center text-white text-xl">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#007CBF] to-[#006A9C] flex items-center justify-center text-white text-xl">
                   SL
                 </div>
                 <div>
@@ -388,13 +437,26 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
                   </div>
 
                   <div className="space-y-4 mb-6">
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12">
+                    <Button 
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12"
+                      data-tracking-id={trackingIds.courseDetail.enrollCta}
+                      onClick={() => {
+                        analytics.trackCourseEnrollment(course.id, course.title, course.price);
+                        // Handle enrollment
+                      }}
+                      aria-label={`Enroll in ${course.title} course`}
+                    >
                       Enroll Now
                     </Button>
                     <Button 
                       variant="outline" 
                       className="w-full border-2 border-gray-300 h-12"
-                      onClick={() => setIsVideoModalOpen(true)}
+                      data-tracking-id={trackingIds.courseDetail.previewVideo}
+                      onClick={() => {
+                        analytics.trackVideoPlay(course.id, course.title);
+                        setIsVideoModalOpen(true);
+                      }}
+                      aria-label="Watch course preview video"
                     >
                       <Play className="mr-2 h-4 w-4" />
                       Watch Preview
@@ -845,7 +907,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
                         className="border-b pb-6 last:border-b-0"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-[#007CBF] text-white flex items-center justify-center flex-shrink-0">
                             {testimonial.image}
                           </div>
                           <div className="flex-1">
@@ -890,11 +952,11 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-2 hover:border-purple-600 transition-all h-full">
+                <Card className="border-2 hover:border-[#007CBF] transition-all h-full">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <faq.icon className="h-5 w-5 text-purple-600" />
+                      <div className="w-10 h-10 rounded-full bg-[#007CBF]/10 flex items-center justify-center flex-shrink-0">
+                        <faq.icon className="h-5 w-5 text-[#007CBF]" />
                       </div>
                       <div className="flex-1">
                         <h4 className="text-gray-900 mb-2">{faq.question}</h4>
@@ -992,6 +1054,7 @@ export function IntroGenAICourseDetailPage({ onNavigate }: IntroGenAICourseDetai
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

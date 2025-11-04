@@ -48,8 +48,9 @@ export function ArticleCard({ article, onNavigate, isHovered, onHover }: Article
         <div className="relative overflow-hidden aspect-[16/9]">
           <ImageWithFallback
             src={article.image}
-            alt={article.title}
+            alt={`Featured image for ${article.title} - ${article.category} article about ${article.excerpt.slice(0, 60)}`}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            loading="lazy"
           />
           {article.featured && (
             <Badge className="absolute top-4 left-4 bg-[#007CBF] text-white border-0">
@@ -92,8 +93,9 @@ export function ArticleCard({ article, onNavigate, isHovered, onHover }: Article
             <div className="flex items-center gap-3">
               <ImageWithFallback
                 src={article.authorImage}
-                alt={article.author}
+                alt={`Profile photo of ${article.author}, author at QuantUniversity`}
                 className="w-8 h-8 rounded-full"
+                loading="lazy"
               />
               <div>
                 <p className="text-sm text-gray-900">{article.author}</p>

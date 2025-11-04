@@ -1,19 +1,75 @@
 import { useState } from 'react';
-import { ArrowLeft, Calendar, User, Clock, BookOpen, Share2, Linkedin, Twitter, Link2, Play, X, ArrowRight, CheckCircle, Code, Shield, Zap, TrendingUp, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Clock, BookOpen, Share2, Linkedin, Twitter, Link2, Play, X, ArrowRight, CheckCircle, Code, Shield, Zap, TrendingUp, ChevronRight, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
+import { SEO } from '../components/SEO';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../data/seo';
+import { getArticleById } from '../data/articles';
 
 interface BlogArticlePageProps {
   onNavigate: (page: string) => void;
+  articleId?: string | number | null;
 }
 
-export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
+export function BlogArticlePage({ onNavigate, articleId }: BlogArticlePageProps) {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
+
+  // Helper to convert date format from "Oct 31, 2025" to "2025-10-31"
+  const convertToISODate = (dateStr: string): string => {
+    try {
+      const date = new Date(dateStr);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return '2025-10-31';
+    }
+  };
+
+  // Get article from data or fall back to default "vibe-coding" article
+  const articleData = articleId ? getArticleById(articleId) : getArticleById('vibe-coding');
+  
+  // Use the fetched article or fallback to hardcoded default
+  const article = articleData ? {
+    title: articleData.title,
+    description: articleData.excerpt,
+    author: articleData.author,
+    publishDate: convertToISODate(articleData.date),
+    displayDate: articleData.date,
+    image: articleData.image,
+    category: articleData.category,
+    readTime: articleData.readTime,
+    tags: articleData.tags || []
+  } : {
+    title: 'Beyond Vibe-Coding: Managing the Risks of Generative AI in Code Development',
+    description: 'How do we know if AI-generated code is correct, efficient, and safe to deploy? Exploring validation frameworks from HumanEval to AeroEval.',
+    author: 'Sri Krishnamurthy, CFA',
+    publishDate: '2025-10-31',
+    displayDate: 'Oct 31, 2025',
+    image: 'https://images.unsplash.com/photo-1544847558-3ccacb31ee7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2RlJTIwcHJvZ3JhbW1pbmclMjBkZXZlbG9wbWVudCUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzYyMTEzNTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    category: 'Technical Insights',
+    readTime: '8 min read',
+    tags: ['GenAI', 'Risk Management', 'Code Quality']
+  };
+
+  // Structured data
+  const articleSchema = generateArticleSchema(article);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Insights', url: '/insights' },
+    { name: article.title, url: '/insights/vibe-coding' }
+  ]);
 
   const copyLinkToClipboard = () => {
     const url = window.location.href;
@@ -24,18 +80,70 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
 
   const shareToLinkedIn = () => {
     const url = encodeURIComponent(window.location.href);
-    const title = encodeURIComponent('Beyond Vibe-Coding: Managing the Risks of Generative AI in Code Development');
+    const title = encodeURIComponent(article.title);
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
   };
 
   const shareToTwitter = () => {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('Beyond Vibe-Coding: Managing the Risks of Generative AI in Code Development');
+    const text = encodeURIComponent(article.title);
     window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
   };
 
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        customSEO={{
+          title: `${article.title} | QuantUniversity`,
+          description: article.description,
+          keywords: ['generative AI', 'code development', 'AI risk management', 'code validation', 'HumanEval', 'vibe coding'],
+          ogImage: article.image,
+          ogType: 'article',
+          canonicalUrl: '/insights/vibe-coding',
+          author: article.author,
+          publishedTime: article.publishDate,
+          section: article.category,
+          tags: ['GenAI', 'Risk Management', 'Code Quality']
+        }}
+        structuredData={[breadcrumbSchema, articleSchema]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate('thought-leadership')}
+                  className="cursor-pointer hover:text-[#007CBF]"
+                >
+                  Insights
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900 line-clamp-1">{article.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section with Overlay Images */}
       <section className="relative h-[500px] bg-gray-900 overflow-hidden">
         {/* Multiple layered background images for code+finance+AI motif */}
@@ -43,23 +151,26 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
           <div className="absolute inset-0 grid grid-cols-3">
             <div className="relative overflow-hidden">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1544847558-3ccacb31ee7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2RlJTIwcHJvZ3JhbW1pbmclMjBkZXZlbG9wbWVudCUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzYyMTEzNTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Code Development"
+                src={article.image}
+                alt={`${article.title} - featured article image`}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
             <div className="relative overflow-hidden">
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1692598578454-570cb62ecf2f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwY29kZXxlbnwxfHx8fDE3NjIxOTI3ODV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="AI Technology"
+                alt="Artificial intelligence and machine learning technology - representing generative AI code generation"
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
             <div className="relative overflow-hidden">
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1761850167081-473019536383?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaW5hbmNlJTIwdGVjaG5vbG9neSUyMGRhdGF8ZW58MXx8fHwxNzYyMTU1NTAxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Finance Technology"
+                alt="Finance technology and data analytics - showcasing financial modeling and quantitative analysis"
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
           </div>
@@ -78,25 +189,25 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
           </Button>
           
           <Badge className="mb-4 bg-purple-500 text-white border-0 w-fit">
-            Technical Insights
+            {article.category}
           </Badge>
           
           <h1 className="text-white mb-6">
-            Beyond Vibe-Coding: Managing the Risks of Generative AI in Code Development
+            {article.title}
           </h1>
           
           <div className="flex flex-wrap items-center gap-6 text-white/90">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span>October 31, 2025</span>
+              <span>{article.displayDate}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              <span>8 min read</span>
+              <span>{article.readTime}</span>
             </div>
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              <span>Sri Krishnamurthy, CFA, CAP</span>
+              <span>{article.author}</span>
             </div>
           </div>
         </div>
@@ -112,8 +223,9 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
                 <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-[#007CBF] flex-shrink-0">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400"
-                    alt="Sri Krishnamurthy"
+                    alt="Sri Krishnamurthy, CFA - Founder of QuantUniversity and author of this article"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
                 <div className="flex-1">
@@ -485,8 +597,9 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
                   <div className="relative h-48 overflow-hidden">
                     <ImageWithFallback
                       src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwYW5hbHl0aWNzJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc2MjA1ODI0N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                      alt="AI Risk Management"
+                      alt="AI risk management dashboard showing data analytics and model monitoring for financial institutions"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
                     />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-[#007CBF] text-white border-0">Article</Badge>
@@ -571,8 +684,9 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
                   <div className="relative h-48 overflow-hidden">
                     <ImageWithFallback
                       src="https://images.unsplash.com/photo-1758691736722-cda1858056e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHRlYW0lMjBsZWFybmluZyUyMGNsYXNzcm9vbXxlbnwxfHx8fDE3NjIxMTA4MzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                      alt="AI-Ready Teams"
+                      alt="Business team learning and training in classroom setting - building AI-ready teams for financial institutions"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
                     />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-green-500 text-white border-0">Article</Badge>
@@ -656,6 +770,7 @@ export function BlogArticlePage({ onNavigate }: BlogArticlePageProps) {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Course Preview: AI Code Generation & Validation</DialogTitle>
+            <DialogDescription>Watch an introduction to HumanEval & AeroEval Frameworks</DialogDescription>
           </DialogHeader>
           <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
             <div className="text-center text-white">

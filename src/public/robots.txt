@@ -1,0 +1,25 @@
+# robots.txt for QuantUniversity
+# https://www.quantuniversity.com
+
+User-agent: *
+Allow: /
+
+# Disallow specific paths (if needed)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Sitemap location
+Sitemap: https://www.quantuniversity.com/sitemap.xml
+
+# Crawl-delay (optional, adjust if needed)
+# Crawl-delay: 1
+
+# Specific rules for different bots (optional)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

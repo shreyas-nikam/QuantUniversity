@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Download, Play, Mic, FileText, Radio, Newspaper, Globe, Brain, TrendingUp, Shield, Rocket, Users, ArrowRight, ExternalLink, MapPin, Star, Quote, Mail, Phone, ChevronDown, Building2, Upload } from 'lucide-react';
+import { Calendar, Download, Play, Mic, FileText, Radio, Newspaper, Globe, Brain, TrendingUp, Shield, Rocket, Users, ArrowRight, ExternalLink, MapPin, Star, Quote, Mail, Phone, ChevronDown, Building2, Upload, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -7,6 +7,14 @@ import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { ScrollableCarousel } from '../components/ScrollableCarousel';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import {
@@ -17,8 +25,14 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { motion } from 'motion/react';
+import { SEO } from '../components/SEO';
+import { pageSEO, generateFAQSchema, generateBreadcrumbSchema } from '../data/seo';
 
-export function SpeakingMediaPage() {
+interface SpeakingMediaPageProps {
+  onNavigate?: (page: string) => void;
+}
+
+export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
@@ -186,15 +200,80 @@ export function SpeakingMediaPage() {
     ? mediaItems 
     : mediaItems.filter(item => item.type === activeFilter);
 
+  // FAQs for structured data
+  const faqs = [
+    {
+      question: "What topics does Sri Krishnamurthy speak about?",
+      answer: "Sri speaks on Generative AI & Responsible AI, AI in Finance & Quantitative Modeling, AI Risk Management & Governance, and Future of Work & AI Fluency. All talks are customized to your audience and event goals."
+    },
+    {
+      question: "What types of events does Sri speak at?",
+      answer: "Sri has spoken at corporate conferences, industry forums, academic institutions, CFA societies, PRMIA chapters, innovation summits, and executive workshops across 13 countries globally."
+    },
+    {
+      question: "How can I book Sri for a speaking engagement?",
+      answer: "You can book Sri by filling out the speaking request form on this page or emailing info@quantuniversity.com. We'll respond within 24 hours to discuss your event details and requirements."
+    },
+    {
+      question: "Does Sri offer virtual speaking engagements?",
+      answer: "Yes, Sri offers both in-person and virtual speaking engagements. Virtual talks can be delivered via Zoom, Teams, or your preferred platform with full interactive Q&A capabilities."
+    },
+    {
+      question: "What is included in the speaker kit?",
+      answer: "The speaker kit includes Sri's biography, high-resolution photos, talk abstracts, previous speaking testimonials, and sample presentation slides. It's designed to help event organizers promote the session effectively."
+    }
+  ];
+
+  // Breadcrumb structured data
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Speaking & Media', url: '/speaking-media' }
+  ]);
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        title={pageSEO['speaking-media'].title}
+        description={pageSEO['speaking-media'].description}
+        keywords={pageSEO['speaking-media'].keywords}
+        canonicalUrl={pageSEO['speaking-media'].canonicalUrl}
+        ogType={pageSEO['speaking-media'].ogType}
+        structuredData={[breadcrumbSchema, generateFAQSchema(faqs)]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">Speaking & Media</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative py-32 bg-gradient-to-br from-gray-900 via-[#006A9C] to-[#007CBF] overflow-hidden">
         <div className="absolute inset-0">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1563807893646-b6598a2b6fdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb25mZXJlbmNlJTIwc3BlYWtlciUyMHN0YWdlfGVufDF8fHx8MTc2MjE3MDQ3N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Conference speaking"
+            alt="Professional conference speaker presenting on stage at major financial industry event"
             className="w-full h-full object-cover opacity-20"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-[#006A9C]/80 to-[#007CBF]/70"></div>
         </div>
@@ -460,8 +539,9 @@ export function SpeakingMediaPage() {
                       <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                         <ImageWithFallback
                           src={testimonial.image}
-                          alt={testimonial.author}
+                          alt={`${testimonial.author}, ${testimonial.role} at ${testimonial.organization}`}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
                       <div>

@@ -1,24 +1,44 @@
-import { ArrowRight, BookOpen, TrendingUp, Target, Users, Globe, Award, Download, ChevronRight, Star, Clock, Quote, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, TrendingUp, Target, Users, Globe, Award, Download, ChevronRight, Star, Clock, Quote, Play, Sparkles, BadgeCheck, Linkedin } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { motion } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getRecentArticles } from '../data/articles';
 import { testimonials } from '../data/testimonials';
 import { partners } from '../data/partners';
 import { ArticleCard } from '../components/ArticleCard';
 import { PartnerLogosTicker } from '../components/PartnerLogos';
+import { ScrollableCarousel } from '../components/ScrollableCarousel';
+import { SEO } from '../components/SEO';
+import { siteSEO } from '../data/seo';
+import { useAnalytics } from '../components/AnalyticsProvider';
+import { trackingIds } from '../data/analytics';
+import { SkipToContent } from '../components/SkipToContent';
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
+  setSelectedArticleId: (id: string | number | null) => void;
+  setSelectedCourseId: (id: string | number | null) => void;
 }
 
-export function HomePage({ onNavigate }: HomePageProps) {
+export function HomePage({ onNavigate, setSelectedArticleId, setSelectedCourseId }: HomePageProps) {
   const [hoveredCourse, setHoveredCourse] = useState<number | null>(null);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const analytics = useAnalytics();
+  
+  // Pre-compute particle animations to avoid hydration issues
+  const particles = useMemo(() => {
+    return Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      initialX: Math.random() * 1440,
+      initialY: Math.random() * 800,
+      targetY: Math.random() * 800,
+      duration: 10 + Math.random() * 10
+    }));
+  }, []);
 
   const featuredCourses = [
     {
@@ -136,7 +156,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
     'Deutsche Bank'
   ];
 
-  const testimonials = [
+  const shortTestimonials = [
     {
       quote: "QuantUniversity transformed our team's AI capabilities in just 3 months.",
       author: "VP of Risk, Top 10 Bank"
@@ -151,16 +171,105 @@ export function HomePage({ onNavigate }: HomePageProps) {
     }
   ];
 
+  const detailedTestimonials = [
+    {
+      quote: "The Explore-Experience-Excel framework gave our analysts the structured learning they needed to deploy AI responsibly. Sri's emphasis on model risk management was exactly what we needed.",
+      name: "Sri Krishnamurthy",
+      role: "Founder & Chief Learning Officer",
+      org: "QuantUniversity",
+      vertical: "AI Education",
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW58ZW58MXx8fHwxNzYyMTE0MDgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: true,
+      hasCertificate: false,
+      hasLinkedIn: false
+    },
+    {
+      quote: "QuantUniversity gave our team exactly what we needed to understand AI risk — without the fluff. The hands-on labs made all the difference.",
+      name: "Jennifer Park",
+      role: "VP Model Validation",
+      org: "Regional Bank",
+      vertical: "Risk / Model Validation",
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbnxlbnwxfHx8fDE3NjIxMTQwODJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: false,
+      hasLinkedIn: false
+    },
+    {
+      quote: "Got hired as Quant Analyst after finishing the Risk Certificate. The structured program gave me exactly what I needed to transition from traditional finance to AI risk management.",
+      name: "Michael Torres",
+      role: "Quantitative Analyst",
+      org: "Goldman Sachs",
+      vertical: "AI & Risk Management Certificate",
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW4lMjBoZWFkc2hvdHxlbnwxfHx8fDE3NjIxMTQwODJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: true,
+      hasLinkedIn: true,
+      certificateName: "AI & Risk Management"
+    },
+    {
+      quote: "Being able to practice in the labs at 10pm was a game changer. The flexibility fits our global team perfectly.",
+      name: "David Chen",
+      role: "Quantitative Analyst",
+      org: "Asset Management",
+      vertical: "Data Science / Investment",
+      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhc2lhbiUyMG1hbnxlbnwxfHx8fDE3NjIxMTQwODJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: false,
+      hasLinkedIn: false
+    },
+    {
+      quote: "The Responsible GenAI Certificate transformed how I approach AI deployment. Got promoted to Senior AI Engineer within 3 months of completing the program.",
+      name: "Sarah Williams",
+      role: "Senior AI Engineer",
+      org: "JPMorgan Chase",
+      vertical: "Responsible GenAI Certificate",
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbiUyMGhlYWRzaG90fGVufDF8fHx8MTc2MjExNDA4Mnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: true,
+      hasLinkedIn: true,
+      certificateName: "Responsible GenAI"
+    },
+    {
+      quote: "We rolled this out to 120+ analysts in 3 countries. The AI-powered platform made it seamless.",
+      name: "Maria Rodriguez",
+      role: "Head of Learning & Development",
+      org: "Global Investment Bank",
+      vertical: "Enterprise Training",
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBsYXRpbmElMjB3b21hbnxlbnwxfHx8fDE3NjIxMTQwODJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: false,
+      hasLinkedIn: false
+    },
+    {
+      quote: "Completed the Quant Finance Foundations Certificate while working full-time. The self-paced format and practical projects helped me land my dream role at a hedge fund.",
+      name: "Alex Kumar",
+      role: "Quantitative Trader",
+      org: "Citadel",
+      vertical: "Quant Finance Foundations Certificate",
+      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW4lMjBwb3J0cmFpdHxlbnwxfHx8fDE3NjIxMTQwODJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      isSri: false,
+      hasCertificate: true,
+      hasLinkedIn: true,
+      certificateName: "Quant Finance Foundations"
+    }
+  ];
+
   // Auto-rotate testimonials
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      setCurrentTestimonial((prev) => (prev + 1) % shortTestimonials.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [testimonials.length]);
+  }, [shortTestimonials.length]);
 
   return (
-    <div className="bg-white">
+    <>
+      <SEO 
+        pageKey="home"
+        structuredData={[siteSEO.organizationSchema]}
+      />
+      <SkipToContent />
+      <main id="main-content" className="bg-white">
       {/* Hero Section with Motion Background */}
       <section className="relative min-h-screen flex items-center bg-gradient-to-br from-[#007CBF] via-[#006A9C] to-[#005580] overflow-hidden">
         {/* Animated Background Pattern */}
@@ -179,21 +288,21 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </div>
         
         {/* Floating Particles */}
-        {[...Array(5)].map((_, i) => (
+        {particles.map((particle) => (
           <motion.div
-            key={i}
+            key={particle.id}
             className="absolute w-2 h-2 bg-white rounded-full"
             initial={{ 
-              x: Math.random() * 1440, 
-              y: Math.random() * 800,
+              x: particle.initialX, 
+              y: particle.initialY,
               opacity: 0.1
             }}
             animate={{
-              y: [null, Math.random() * 800],
+              y: [null, particle.targetY],
               opacity: [0.1, 0.3, 0.1],
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: particle.duration,
               repeat: Infinity,
               repeatType: 'reverse',
             }}
@@ -214,7 +323,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   Built by world-renowned AI Risk experts
                 </span>
               </div>
-              <h1 className="text-white mb-6">Master AI in Finance — Led by Sri Krishnamurthy, CFA</h1>
+              <h1 className="text-white mb-6">Master AI, Risk & Quant Finance</h1>
               <p className="text-xl text-white/90 mb-4 leading-relaxed max-w-xl">
                 Trusted by 10,000+ professionals across 13+ countries. Industry-tested courses with measurable ROI.
               </p>
@@ -242,7 +351,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   <Button 
                     size="lg" 
                     className="bg-white text-[#007CBF] hover:bg-gray-100 px-8 rounded-lg text-lg h-14 group"
-                    onClick={() => onNavigate('courses')}
+                    data-tracking-id={trackingIds.home.heroCtaPrimary}
+                    onClick={() => {
+                      analytics.trackButtonClick(trackingIds.home.heroCtaPrimary, 'Explore Courses');
+                      onNavigate('courses');
+                    }}
+                    aria-label="Explore all AI and Finance courses"
                   >
                     Explore Courses
                     <motion.div
@@ -257,7 +371,12 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   size="lg" 
                   variant="outline" 
                   className="border-2 border-white text-white hover:bg-white/10 px-8 rounded-lg text-lg h-14"
-                  onClick={() => onNavigate('enterprise')}
+                  data-tracking-id={trackingIds.home.heroCtaSecondary}
+                  onClick={() => {
+                    analytics.trackButtonClick(trackingIds.home.heroCtaSecondary, 'Upskill Your Team');
+                    onNavigate('enterprise');
+                  }}
+                  aria-label="Explore enterprise training solutions"
                 >
                   Upskill Your Team
                 </Button>
@@ -284,8 +403,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwYW5hbHl0aWNzJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc2MjA1ODI0N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                    alt="AI Finance Platform"
+                    alt="AI-powered financial data analytics dashboard showcasing machine learning models and quantitative analysis tools used in QuantUniversity courses"
                     className="w-full h-auto"
+                    loading="eager"
                   />
                   {/* Video Play Overlay */}
                   <motion.div 
@@ -463,15 +583,18 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   <div 
                     className="relative h-48 cursor-pointer overflow-hidden"
                     onClick={() => {
-                      if (course.id === 4) {
-                        onNavigate('course-detail');
+                      if (course.id === 2) {
+                        onNavigate('intro-genai-course');
+                      } else if (course.id === 4) {
+                        onNavigate('ml-trading-finance');
                       }
                     }}
                   >
                     <ImageWithFallback
                       src={course.image}
-                      alt={course.title}
+                      alt={`${course.title} - ${course.duration} ${course.mode} course covering ${course.outcome}`}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      loading="lazy"
                     />
                     <div className="absolute top-4 right-4 flex gap-2">
                       <Badge className="bg-[#007CBF] text-white border-0">
@@ -514,8 +637,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     <h4 
                       className="text-gray-900 mb-2 cursor-pointer hover:text-[#007CBF] transition-colors"
                       onClick={() => {
-                        if (course.id === 4) {
-                          onNavigate('course-detail');
+                        if (course.id === 2) {
+                          onNavigate('intro-genai-course');
+                        } else if (course.id === 4) {
+                          onNavigate('ml-trading-finance');
                         }
                       }}
                     >
@@ -536,12 +661,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
                       <Button 
                         className="bg-[#007CBF] hover:bg-[#006A9C] text-white"
                         onClick={() => {
-                          if (course.id === 4) {
-                            onNavigate('course-detail');
+                          if (course.id === 2) {
+                            onNavigate('intro-genai-course');
+                          } else if (course.id === 4) {
+                            onNavigate('ml-trading-finance');
                           }
                         }}
                       >
-                        {course.id === 4 ? 'View Details' : 'Enroll Now'}
+                        {(course.id === 2 || course.id === 4) ? 'View Details' : 'Enroll Now'}
                       </Button>
                     </div>
                   </CardContent>
@@ -743,7 +870,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   <ArticleCard
                     key={article.id}
                     article={article}
-                    onNavigate={onNavigate}
+                    onNavigate={(page) => {
+                      setSelectedArticleId(article.id);
+                      onNavigate(page);
+                    }}
                     onHover={setHoveredCourse}
                     isHovered={hoveredCourse === index}
                   />
@@ -826,6 +956,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
-    </div>
+    </main>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Award, Users, Clock, Star, Filter, ArrowRight, Lightbulb, X, GraduationCap, Info, Sparkles } from 'lucide-react';
+import { Search, Award, Users, Clock, Star, Filter, ArrowRight, Lightbulb, X, GraduationCap, Info, Sparkles, ChevronRight, Home } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -10,6 +10,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popove
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { getAllCourses, getCertificatesForCourse, Course, Certificate } from '../data/coursesAndCertificates';
 import { motion, AnimatePresence } from 'motion/react';
+import { SEO } from '../components/SEO';
+import { generateBreadcrumbSchema } from '../data/seo';
+import { useAnalytics } from '../components/AnalyticsProvider';
+import { trackingIds } from '../data/analytics';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '../components/ui/breadcrumb';
 
 interface CoursesPageProps {
   onNavigate?: (page: string) => void;
@@ -25,6 +37,7 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
   const [hoveredCourseId, setHoveredCourseId] = useState<string | null>(null);
   const [highlightedCourseId, setHighlightedCourseId] = useState<string | null>(null);
   const courseRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const analytics = useAnalytics();
 
   const allCourses = getAllCourses();
 
@@ -133,9 +146,19 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
   const activeFiltersCount = (selectedCategories.filter(c => c !== 'all').length) + selectedDifficulties.length + (showOnlyCertificateCourses ? 1 : 0);
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-[#007CBF] to-[#006A9C] overflow-hidden">
+    <>
+      <SEO 
+        pageKey="courses"
+        structuredData={[
+          generateBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Courses', url: '/courses' }
+          ])
+        ]}
+      />
+      <div className="bg-white min-h-screen">
+        {/* Hero Section */}
+        <section className="relative py-20 bg-gradient-to-br from-[#007CBF] to-[#006A9C] overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-10"></div>
         
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 relative z-10">
@@ -161,6 +184,31 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">Courses</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </section>
 
@@ -331,8 +379,9 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
                     >
                       <ImageWithFallback
                         src={getCourseImage(course.category)}
-                        alt={course.title}
+                        alt={`${course.title} - ${course.level} level ${course.category} course`}
                         className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                       <div className="absolute top-4 right-4">
@@ -423,12 +472,16 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
                         <Button 
                           className="bg-[#007CBF] hover:bg-[#006A9C] text-white"
                           onClick={() => {
-                            if (course.id === 'ml-trading-finance' && onNavigate) {
-                              onNavigate('course-detail');
+                            if (onNavigate) {
+                              if (course.id === 'ml-trading-finance') {
+                                onNavigate('course-detail');
+                              } else if (course.id === 'intro-genai') {
+                                onNavigate('intro-genai-course');
+                              }
                             }
                           }}
                         >
-                          {course.id === 'ml-trading-finance' ? 'View Details' : 'Start Learning'}
+                          {(course.id === 'ml-trading-finance' || course.id === 'intro-genai') ? 'View Details' : 'Start Learning'}
                         </Button>
                       </div>
                     </CardContent>
@@ -520,8 +573,9 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
                 <div className="relative h-full min-h-[400px] lg:min-h-[500px] bg-gradient-to-br from-[#007CBF]/5 to-[#006A9C]/10">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1758691736082-b69a65770026?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHRlYW0lMjB0cmFpbmluZ3xlbnwxfHx8fDE3NjIxODkxNjd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                    alt="Enterprise team training"
+                    alt="Business team training session showing corporate learning and professional development"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -530,5 +584,6 @@ export function CoursesPage({ onNavigate }: CoursesPageProps = {}) {
         </div>
       </section>
     </div>
+    </>
   );
 }

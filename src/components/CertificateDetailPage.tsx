@@ -1,12 +1,22 @@
 import { useState } from 'react';
-import { Check, Clock, Award, ArrowLeft, Play, CheckCircle, BookOpen, X, DollarSign, Users, Star, ExternalLink } from 'lucide-react';
+import { Check, Clock, Award, ArrowLeft, Play, CheckCircle, BookOpen, X, DollarSign, Users, Star, ExternalLink, Home, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from './ui/breadcrumb';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { Certificate, Course, getCoursesForCertificate, courses } from '../data/coursesAndCertificates';
+import { SEO } from './SEO';
+import { generateBreadcrumbSchema, generateFAQSchema } from '../data/seo';
 
 interface CertificateDetailPageProps {
   certificate: Certificate;
@@ -19,15 +29,35 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [courseModalOpen, setCourseModalOpen] = useState(false);
 
+  // Defensive check for certificate data
+  if (!certificate || !certificate.id || !certificate.title) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <h1 className="text-2xl mb-4">Invalid Certificate Data</h1>
+          <button 
+            onClick={() => onNavigate('certificate-programs')}
+            className="text-[#007CBF] hover:underline"
+          >
+            Return to Certificate Programs
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const certificateCourses = getCoursesForCertificate(certificate.id);
   
-  // Calculate individual course total
-  const individualTotal = certificateCourses.reduce((sum, course) => sum + course.price, 0);
-  const savings = individualTotal - certificate.price;
-  const savingsPercent = Math.round((savings / individualTotal) * 100);
+  // Calculate individual course total with safety check
+  const individualTotal = certificateCourses.reduce((sum, course) => {
+    return sum + (course?.price || 0);
+  }, 0);
+  const savings = Math.max(0, individualTotal - (certificate.price || 0));
+  const savingsPercent = individualTotal > 0 ? Math.round((savings / individualTotal) * 100) : 0;
 
   const getColorClasses = () => {
-    if (certificate.color.includes('blue')) {
+    const colorValue = certificate?.color || '';
+    if (colorValue.includes('blue')) {
       return {
         bg: 'from-[#007CBF] to-[#005A8C]',
         text: 'text-[#007CBF]',
@@ -35,7 +65,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
         bgLight: 'bg-[#007CBF]/10',
         hoverBorder: 'hover:border-[#007CBF]'
       };
-    } else if (certificate.color.includes('green')) {
+    } else if (colorValue.includes('green')) {
       return {
         bg: 'from-[#007CBF] to-[#006A9C]',
         text: 'text-[#007CBF]',
@@ -43,7 +73,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
         bgLight: 'bg-[#007CBF]/10',
         hoverBorder: 'hover:border-[#007CBF]'
       };
-    } else if (certificate.color.includes('purple')) {
+    } else if (colorValue.includes('purple')) {
       return {
         bg: 'from-[#007CBF] to-[#006A9C]',
         text: 'text-[#007CBF]',
@@ -68,8 +98,77 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
     setCourseModalOpen(true);
   };
 
+  // Structured data
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Certificate Programs', url: '/certificate-programs' },
+    { name: certificate.title, url: `/certificate-programs/${certificate.id}` }
+  ]);
+
+  // Convert FAQ data to schema format if available
+  const faqSchema = certificate.faqs ? generateFAQSchema(
+    certificate.faqs.map((faq: any) => ({
+      question: faq.question,
+      answer: faq.answer
+    }))
+  ) : null;
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        customSEO={{
+          title: `${certificate.title} - Professional Certificate | QuantUniversity`,
+          description: certificate.description,
+          keywords: [
+            certificate.title,
+            'professional certificate',
+            'AI certification',
+            'finance certification',
+            certificate.track || 'education'
+          ],
+          ogImage: undefined,
+          ogType: 'website',
+          canonicalUrl: `/certificate-programs/${certificate.id}`
+        }}
+        structuredData={faqSchema ? [breadcrumbSchema, faqSchema] : breadcrumbSchema}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate('certificate-programs')}
+                  className="cursor-pointer hover:text-[#007CBF]"
+                >
+                  Certificate Programs
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">{certificate.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className={`relative py-20 bg-gradient-to-br ${colors.bg} overflow-hidden`}>
         <div className="absolute inset-0 opacity-10">
@@ -111,15 +210,15 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                   <div className="text-sm text-white/80">Courses</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white mb-1">{certificate.duration}</div>
+                  <div className="text-2xl font-bold text-white mb-1">{certificate.duration || 'N/A'}</div>
                   <div className="text-sm text-white/80">Duration</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white mb-1">{certificate.format}</div>
+                  <div className="text-2xl font-bold text-white mb-1">{certificate.format || 'N/A'}</div>
                   <div className="text-sm text-white/80">Format</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white mb-1">Save {certificate.savings}</div>
+                  <div className="text-2xl font-bold text-white mb-1">Save {certificate.savings || 'N/A'}</div>
                   <div className="text-sm text-white/80">vs Individual</div>
                 </div>
               </div>
@@ -129,7 +228,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                   size="lg"
                   className="bg-white text-gray-900 hover:bg-gray-100 h-14 px-8"
                 >
-                  Enroll Now - ${certificate.price.toLocaleString()}
+                  Enroll Now - ${(certificate.price || 0).toLocaleString()}
                 </Button>
                 <Button
                   size="lg"
@@ -160,7 +259,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                   <div className="p-6 bg-white">
                     <h4 className="text-gray-900 mb-3">What You'll Learn</h4>
                     <ul className="space-y-2">
-                      {certificate.outcomes.slice(0, 3).map((outcome, idx) => (
+                      {(certificate.outcomes || []).slice(0, 3).map((outcome, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
                           <CheckCircle className="h-4 w-4 text-[#007CBF] flex-shrink-0 mt-0.5" />
                           <span>{outcome}</span>
@@ -206,28 +305,28 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <Clock className="h-4 w-4" />
-                          {course.duration}
+                          {course?.duration || 'N/A'}
                         </div>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <DollarSign className="h-4 w-4" />
-                          ${course.price}
+                          ${course?.price || 0}
                         </div>
                       </div>
                     </div>
-                    <h4 className="text-gray-900 mb-2">{course.title}</h4>
-                    <p className="text-sm text-gray-600 mb-4">{course.description}</p>
+                    <h4 className="text-gray-900 mb-2">{course?.title || 'Untitled'}</h4>
+                    <p className="text-sm text-gray-600 mb-4">{course?.description || ''}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1">
                         <BookOpen className="h-4 w-4" />
-                        {course.modules} modules
+                        {course?.modules || 0} modules
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {course.students.toLocaleString()} students
+                        {(course?.students || 0).toLocaleString()} students
                       </span>
                       <span className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        {course.rating}
+                        {course?.rating || 0}
                       </span>
                     </div>
                     <div className={`mt-4 text-sm ${colors.text} group-hover:underline`}>
@@ -262,7 +361,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                   <div className="text-center">
                     <div className="text-sm text-gray-600 mb-2">Certificate Price</div>
                     <div className="text-4xl font-bold text-[#007CBF]">
-                      ${certificate.price.toLocaleString()}
+                      ${(certificate.price || 0).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -285,7 +384,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                 By completing this certificate program, you'll master the essential skills for this domain.
               </p>
               <div className="space-y-4">
-                {certificate.outcomes.map((outcome, idx) => (
+                {(certificate.outcomes || []).map((outcome, idx) => (
                   <motion.div
                     key={idx}
                     className="flex items-start gap-3"
@@ -311,7 +410,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                     This certificate is recognized by leading institutions including:
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    {certificate.recognizedBy.map((company, idx) => (
+                    {(certificate.recognizedBy || []).map((company, idx) => (
                       <Badge key={idx} variant="outline" className={`${colors.border} ${colors.text}`}>
                         {company}
                       </Badge>
@@ -356,7 +455,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
               size="lg"
               className="bg-white text-gray-900 hover:bg-gray-100 h-14 px-8"
             >
-              Enroll Now - ${certificate.price.toLocaleString()}
+              Enroll Now - ${(certificate.price || 0).toLocaleString()}
             </Button>
             <Button
               size="lg"
@@ -368,7 +467,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
             </Button>
           </div>
           <p className="text-sm text-white/70 mt-6">
-            Save {certificate.savings} compared to purchasing courses individually • 30-day money-back guarantee
+            Save {certificate.savings || 'N/A'} compared to purchasing courses individually • 30-day money-back guarantee
           </p>
         </div>
       </section>
@@ -378,6 +477,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>{certificate.title} Preview</DialogTitle>
+            <DialogDescription>Watch an overview of the certificate program</DialogDescription>
           </DialogHeader>
           <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
             <div className="text-center text-white">
@@ -394,35 +494,36 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
           {selectedCourse && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl">{selectedCourse.title}</DialogTitle>
+                <DialogTitle className="text-2xl">{selectedCourse?.title || 'Course Details'}</DialogTitle>
+                <DialogDescription>Detailed information about this course</DialogDescription>
               </DialogHeader>
               <div className="space-y-6">
                 <div>
                   <Badge className={`${colors.bgLight} ${colors.text} border-0 mb-3`}>
-                    {selectedCourse.category}
+                    {selectedCourse?.category || 'Course'}
                   </Badge>
-                  <p className="text-gray-600 leading-relaxed">{selectedCourse.detailedDescription}</p>
+                  <p className="text-gray-600 leading-relaxed">{selectedCourse?.detailedDescription || ''}</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <Clock className="h-6 w-6 mx-auto mb-2 text-[#007CBF]" />
-                    <div className="font-semibold">{selectedCourse.duration}</div>
+                    <div className="font-semibold">{selectedCourse?.duration || 'N/A'}</div>
                     <div className="text-sm text-gray-600">Duration</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <BookOpen className="h-6 w-6 mx-auto mb-2 text-[#007CBF]" />
-                    <div className="font-semibold">{selectedCourse.modules}</div>
+                    <div className="font-semibold">{selectedCourse?.modules || 0}</div>
                     <div className="text-sm text-gray-600">Modules</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <Users className="h-6 w-6 mx-auto mb-2 text-[#007CBF]" />
-                    <div className="font-semibold">{selectedCourse.students.toLocaleString()}</div>
+                    <div className="font-semibold">{(selectedCourse?.students || 0).toLocaleString()}</div>
                     <div className="text-sm text-gray-600">Students</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <Star className="h-6 w-6 mx-auto mb-2 text-yellow-500 fill-yellow-500" />
-                    <div className="font-semibold">{selectedCourse.rating}</div>
+                    <div className="font-semibold">{selectedCourse?.rating || 0}</div>
                     <div className="text-sm text-gray-600">Rating</div>
                   </div>
                 </div>
@@ -430,7 +531,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Learning Outcomes</h4>
                   <ul className="space-y-2">
-                    {selectedCourse.learningOutcomes.map((outcome, idx) => (
+                    {(selectedCourse.learningOutcomes || []).map((outcome, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <CheckCircle className="h-5 w-5 text-[#007CBF] flex-shrink-0 mt-0.5" />
                         <span className="text-gray-700">{outcome}</span>
@@ -442,7 +543,7 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Prerequisites</h4>
                   <ul className="space-y-2">
-                    {selectedCourse.prerequisites.map((prereq, idx) => (
+                    {(selectedCourse.prerequisites || []).map((prereq, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <div className="w-2 h-2 rounded-full bg-[#007CBF] mt-2"></div>
                         <span className="text-gray-700">{prereq}</span>
@@ -454,11 +555,11 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                 <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                   <div>
                     <div className="text-sm text-gray-600">Instructor</div>
-                    <div className="font-semibold text-gray-900">{selectedCourse.instructor}</div>
+                    <div className="font-semibold text-gray-900">{selectedCourse?.instructor || 'TBD'}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-600">Individual Price</div>
-                    <div className="text-2xl font-bold text-[#007CBF]">${selectedCourse.price}</div>
+                    <div className="text-2xl font-bold text-[#007CBF]">${selectedCourse?.price || 0}</div>
                   </div>
                 </div>
 
@@ -467,13 +568,13 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                     💡 <strong>Part of {certificate.title}</strong>
                   </p>
                   <p className="text-sm text-gray-700">
-                    This course is included in the certificate program. Save {certificate.savings} when enrolling in the full program instead of individual courses.
+                    This course is included in the certificate program. Save {certificate.savings || 'N/A'} when enrolling in the full program instead of individual courses.
                   </p>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="pt-4 border-t space-y-3">
-                  {courseDetailPageMap[selectedCourse.id] && (
+                  {selectedCourse?.id && courseDetailPageMap[selectedCourse.id] && (
                     <Button
                       className={`w-full bg-gradient-to-r ${colors.bg} hover:opacity-90 text-white`}
                       onClick={() => {
@@ -489,7 +590,9 @@ export function CertificateDetailPage({ certificate, onNavigate, courseDetailPag
                     variant="outline"
                     className="w-full border-2 border-[#007CBF] text-[#007CBF] hover:bg-[#007CBF]/5"
                     onClick={() => {
-                      window.open('/courses#' + selectedCourse.id, '_blank');
+                      if (selectedCourse?.id) {
+                        window.open('/courses#' + selectedCourse.id, '_blank');
+                      }
                     }}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />

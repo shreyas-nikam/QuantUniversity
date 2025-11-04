@@ -6,7 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { ScrollableCarousel } from '../components/ScrollableCarousel';
@@ -316,6 +316,7 @@ export function CourseDetailPage({ onNavigate }: CourseDetailPageProps) {
                 <DialogContent className="max-w-4xl">
                   <DialogHeader>
                     <DialogTitle>Course Preview</DialogTitle>
+                    <DialogDescription>Watch a sample intro lecture showcasing course content</DialogDescription>
                   </DialogHeader>
                   <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">

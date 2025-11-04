@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, Award, Users, CheckCircle, ArrowRight, BarChart, Shield, Zap, Handshake, Star, GraduationCap, Globe, Building2, Calendar, ChevronDown, ChevronUp, Mail, Phone, ExternalLink, Clock } from 'lucide-react';
+import { Target, TrendingUp, Award, Users, CheckCircle, ArrowRight, BarChart, Shield, Zap, Handshake, Star, GraduationCap, Globe, Building2, Calendar, ChevronDown, ChevronUp, Mail, Phone, ExternalLink, Clock, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -15,8 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { motion, useInView } from 'motion/react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { SEO } from '../components/SEO';
+import { pageSEO, generateFAQSchema, generateBreadcrumbSchema } from '../data/seo';
 
 interface AnimatedCounterProps {
   end: number;
@@ -221,8 +231,72 @@ export function EnterprisePage() {
     }
   ];
 
+  // FAQs for structured data
+  const faqs = [
+    {
+      question: "What types of organizations does QuantUniversity work with?",
+      answer: "We work with banks, asset managers, insurance companies, fintech firms, and regulatory bodies globally. Our enterprise training programs have been deployed across 150+ organizations in 13+ countries."
+    },
+    {
+      question: "How does the enterprise training process work?",
+      answer: "We follow a 4-step process: Assess your AI readiness and skill gaps, Train with custom learning paths and live instruction, Measure progress with analytics dashboards, and Scale AI capability across departments with proven frameworks."
+    },
+    {
+      question: "Can the training content be customized for our organization?",
+      answer: "Yes, we offer fully customized learning paths tailored to your organization's specific needs, industry context, and skill levels. We can integrate with your existing systems and LMS platforms."
+    },
+    {
+      question: "How do you measure the ROI of enterprise training?",
+      answer: "We track key metrics including completion rates, skill assessments, time-to-competency, and business impact measures such as reduction in model audit time (typically 40%) and increased deployment velocity."
+    },
+    {
+      question: "Do you offer bulk pricing for teams?",
+      answer: "Yes, we offer flexible pricing models for enterprise clients including team licenses, department-wide deployments, and organization-wide programs. Contact us for a custom quote based on your specific needs."
+    }
+  ];
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        title={pageSEO.enterprise.title}
+        description={pageSEO.enterprise.description}
+        keywords={pageSEO.enterprise.keywords}
+        canonicalUrl={pageSEO.enterprise.canonicalUrl}
+        ogType={pageSEO.enterprise.ogType}
+        structuredData={[
+          generateBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Enterprise Solutions', url: '/enterprise' }
+          ]),
+          generateFAQSchema(faqs)
+        ]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">Enterprise Solutions</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section with Animated Metrics */}
       <section className="relative py-32 bg-gradient-to-br from-gray-900 via-[#006A9C] to-[#007CBF] overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
@@ -239,7 +313,10 @@ export function EnterprisePage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Dialog open={showCalendly} onOpenChange={setShowCalendly}>
                 <DialogTrigger asChild>
-                  <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white text-[#007CBF] hover:bg-gray-100 px-8 h-14 text-lg font-medium transition-colors cursor-pointer">
+                  <button 
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white text-[#007CBF] hover:bg-gray-100 px-8 h-14 text-lg font-medium transition-colors cursor-pointer"
+                    aria-label="Open calendar dialog to schedule a strategy call with QuantUniversity enterprise team"
+                  >
                     <Calendar className="h-5 w-5" />
                     Book a Strategy Call
                   </button>
@@ -313,6 +390,7 @@ export function EnterprisePage() {
                 size="lg" 
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-[#007CBF] px-8 rounded-lg h-14 text-lg"
+                aria-label="Download enterprise training brochure PDF with program details and pricing"
               >
                 Download Brochure
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -394,6 +472,7 @@ export function EnterprisePage() {
                   size="lg"
                   className="bg-[#007CBF] hover:bg-[#006A9C] text-white h-12 px-8"
                   onClick={() => window.location.href = '/certificate-programs'}
+                  aria-label="Navigate to certificate programs page to explore structured learning paths"
                 >
                   Explore Certificate Programs
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -409,6 +488,7 @@ export function EnterprisePage() {
                     link.download = 'QuantUniversity-Certificate-Programs.pdf';
                     link.click();
                   }}
+                  aria-label="Download one-page PDF overview of certificate programs for enterprise training"
                 >
                   Download 1-Pager
                   <ExternalLink className="ml-2 h-5 w-5" />
@@ -831,8 +911,9 @@ export function EnterprisePage() {
                     <div className="relative h-32 mb-6 rounded-lg overflow-hidden bg-gray-100">
                       <ImageWithFallback
                         src={testimonial.image}
-                        alt={testimonial.company}
+                        alt={`${testimonial.company} financial institution building - enterprise client of QuantUniversity`}
                         className="w-full h-full object-cover opacity-40"
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="bg-white rounded-xl p-4 shadow-lg">
@@ -999,3 +1080,4 @@ export function EnterprisePage() {
     </div>
   );
 }
+export default EnterprisePage;

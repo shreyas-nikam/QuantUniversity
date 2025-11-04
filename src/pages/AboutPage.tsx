@@ -1,12 +1,22 @@
 import { useState } from 'react';
-import { Award, Users, Globe, TrendingUp, Target, CheckCircle, ArrowRight, Mic, Rocket, GraduationCap, Building2, Sparkles, Calendar, BookOpen, Play, X, MessageSquare, Linkedin, Trophy, Lightbulb, ChevronDown, Briefcase, DollarSign } from 'lucide-react';
+import { Award, Users, Globe, TrendingUp, Target, CheckCircle, ArrowRight, Mic, Rocket, GraduationCap, Building2, Sparkles, Calendar, BookOpen, Play, X, MessageSquare, Linkedin, Trophy, Lightbulb, ChevronDown, Briefcase, DollarSign, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion, AnimatePresence } from 'motion/react';
+import { SEO } from '../components/SEO';
+import { generateBreadcrumbSchema, siteSEO } from '../data/seo';
 
 interface AboutPageProps {
   onNavigate?: (page: string) => void;
@@ -126,16 +136,53 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
     }
   ];
 
+  // Structured data
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'About', url: '/about' }
+  ]);
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        pageKey="about"
+        structuredData={[breadcrumbSchema, siteSEO.organizationSchema]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">About Us</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section with Background Overlay + Scrolling Ticker */}
       <section className="relative py-32 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1760546465497-d9319a137fe2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBrZXlub3RlJTIwc3BlYWtlciUyMHByZXNlbnRhdGlvbnxlbnwxfHx8fDE3NjIxOTMzODV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Sri Krishnamurthy Speaking"
+            alt="Sri Krishnamurthy delivering a professional keynote presentation on AI and finance at a major conference"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-[#007CBF]/95 via-[#006A9C]/90 to-[#005580]/95"></div>
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
@@ -147,8 +194,9 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
               <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl blur-3xl"></div>
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1759922378092-14917cba3f59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBzcGVha2VyJTIwcHJlc2VudGF0aW9ufGVufDF8fHx8MTc2MjAyMjc4MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Sri Krishnamurthy"
+                alt="Sri Krishnamurthy, CFA, CAP - Founder and CEO of QuantUniversity, recognized thought leader in AI and quantitative finance"
                 className="relative rounded-2xl shadow-2xl w-full aspect-square object-cover border-4 border-white/20"
+                loading="lazy"
               />
             </div>
             <div className="text-white">
@@ -167,6 +215,7 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
                   onClick={() => onNavigate?.('speaking-media')}
                   variant="secondary"
                   className="bg-white text-[#007CBF] hover:bg-gray-100"
+                  aria-label="Navigate to speaking and media page to book Sri Krishnamurthy for speaking engagements"
                 >
                   <Mic className="mr-2 h-5 w-5" />
                   Book Sri to Speak
@@ -175,6 +224,7 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
                   variant="outline"
                   className="border-2 border-white text-white hover:bg-white/10"
                   onClick={() => setVideoModalOpen(true)}
+                  aria-label="Open video modal to watch QuantUniversity's story"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Watch Story
@@ -501,8 +551,9 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
                 <div className="lg:col-span-2 relative group">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1759922378092-14917cba3f59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBzcGVha2VyJTIwcHJlc2VudGF0aW9ufGVufDF8fHx8MTc2MjAyMjc4MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                    alt="Sri Krishnamurthy"
+                    alt="Sri Krishnamurthy, CFA, CAP - Founder of QuantUniversity and expert in AI and quantitative finance"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                   {/* Video Play Overlay */}
                   <div 
@@ -719,6 +770,7 @@ export function AboutPage({ onNavigate }: AboutPageProps = {}) {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Why I Built QuantUniversity - Sri Krishnamurthy</DialogTitle>
+            <DialogDescription>From Wall Street to AI Education: The QuantUniversity Journey</DialogDescription>
           </DialogHeader>
           <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
             <div className="text-center text-white">

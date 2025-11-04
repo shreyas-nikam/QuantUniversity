@@ -1,9 +1,17 @@
 # QuantUniversity Website - Maintenance Guide
-**Last Updated**: November 3, 2025
+**Last Updated**: November 4, 2025
 
 ## Overview
 
 This guide explains how to add new content (articles, courses, certificates, testimonials) without modifying component code. All content is centralized in the `/data` folder for easy maintenance.
+
+## 📘 Specialized Guides
+
+For detailed instructions on specific topics:
+- **Adding Certificate Programs**: See `/guidelines/GenerateCertificates.md` (comprehensive guide)
+- **Quick Certificate Reference**: See `/guidelines/CERTIFICATE_QUICK_START.md` (quick checklist)
+- **Adding Course Detail Pages**: See `/guidelines/GenerateCourseDetails.md` (comprehensive guide)
+- **Quick Course Details Reference**: See `/guidelines/COURSE_DETAILS_QUICK_START.md` (quick checklist)
 
 ---
 
@@ -41,6 +49,11 @@ Simply add a new object to the `articles` array:
 
 ### 2. Adding a New Course
 
+**📚 For course detail pages, see `/guidelines/GenerateCourseDetails.md`**
+**⚡ For quick reference, see `/guidelines/COURSE_DETAILS_QUICK_START.md`**
+
+**Quick Summary**:
+
 **File**: `/data/coursesAndCertificates.ts`
 
 Add a new course to the `courses` object:
@@ -59,27 +72,34 @@ Add a new course to the `courses` object:
   students: 2500,
   category: 'Category Name',
   detailedDescription: 'Full course description for detail pages',
-  learningOutcomes: [
-    'Outcome 1',
-    'Outcome 2',
-    'Outcome 3'
-  ],
-  prerequisites: ['Prerequisite 1', 'Prerequisite 2']
+  learningOutcomes: ['Outcome 1', 'Outcome 2', 'Outcome 3'],
+  prerequisites: ['Prerequisite 1', 'Prerequisite 2'],
+  
+  // Optional: For course detail pages, add:
+  hasDetailPage: true,
+  courseModules: [...],
+  features: [...],
+  testimonials: [...],
+  faqs: [...],
+  // See course detail guides for full reference
 }
 ```
 
 **Where it appears**:
 - CoursesPage: All courses listing
 - Certificate pages: As part of certificate bundles
-- CourseDetailPage: Individual course pages
+- Course detail pages: Individual detailed pages (if hasDetailPage: true)
 
 ---
 
 ### 3. Adding a New Certificate Program
 
-**File**: `/data/coursesAndCertificates.ts`
+**📚 For comprehensive instructions, see `/guidelines/GenerateCertificates.md`**
+**⚡ For quick reference, see `/guidelines/CERTIFICATE_QUICK_START.md`**
 
-Add a new certificate to the `certificates` object:
+**Quick Summary**:
+
+**Step 1**: Add certificate data to `/data/coursesAndCertificates.ts`
 
 ```typescript
 'certificate-slug': {
@@ -93,24 +113,20 @@ Add a new certificate to the `certificates` object:
   savings: '20%',
   color: 'from-blue-500 to-blue-600', // Tailwind gradient
   price: 2499,
-  courseIds: [
-    'course-slug-1',
-    'course-slug-2',
-    'course-slug-3'
-  ],
+  courseIds: ['course-slug-1', 'course-slug-2', 'course-slug-3'],
   featured: true,
-  outcomes: [
-    'Learning outcome 1',
-    'Learning outcome 2'
-  ],
+  outcomes: ['Learning outcome 1', 'Learning outcome 2'],
   recognizedBy: ['Company 1', 'Company 2']
 }
 ```
 
+**Step 2**: Create page file `/pages/YourCertificateCertPage.tsx`
+**Step 3**: Add route to `/App.tsx`
+
 **Where it appears**:
 - CertificateProgramsPage: All certificates listing
 - HomePage: Featured certificates
-- Individual certificate detail pages
+- Individual certificate detail pages (auto-generated from data)
 
 ---
 

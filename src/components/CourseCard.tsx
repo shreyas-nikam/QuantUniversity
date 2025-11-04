@@ -34,8 +34,9 @@ export function CourseCard({
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <ImageWithFallback
           src={image}
-          alt={title}
+          alt={`${title} - ${level} level ${category} course with ${rating} star rating and ${students.toLocaleString()} students`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-black/30"></div>
         <Badge className="absolute top-4 right-4 bg-[#007CBF] text-white border-0">

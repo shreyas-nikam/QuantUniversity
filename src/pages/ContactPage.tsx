@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, MessageSquare, Users, Briefcase, ArrowRight, Globe, Calendar as CalendarIcon, Clock, HelpCircle, Book, Building, Award, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Users, Briefcase, ArrowRight, Globe, Calendar as CalendarIcon, Clock, HelpCircle, Book, Building, Award, CheckCircle, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -18,7 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { motion } from 'motion/react';
+import { SEO } from '../components/SEO';
+import { generateFAQSchema, generateBreadcrumbSchema } from '../data/seo';
 
 interface ContactPageProps {
   onNavigate?: (page: string) => void;
@@ -142,8 +152,49 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
     }
   ];
 
+  // Structured data
+  const faqSchema = generateFAQSchema(faqs.map(faq => ({
+    question: faq.question,
+    answer: faq.answer
+  })));
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Contact', url: '/contact' }
+  ]);
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        pageKey="contact"
+        structuredData={[breadcrumbSchema, faqSchema]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">Contact</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-[#007CBF] to-[#006A9C]">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
@@ -382,6 +433,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   type="submit"
                   size="lg"
                   className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white h-14 text-lg"
+                  aria-label="Submit contact form to send your message to QuantUniversity"
                 >
                   Send Message
                   <Send className="ml-2 h-5 w-5" />
@@ -601,6 +653,7 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <Button 
                       className="bg-[#007CBF] hover:bg-[#006A9C] text-white"
                       onClick={() => setShowCalendly(true)}
+                      aria-label="Open calendar to book a free 15-minute consultation call with QuantUniversity team"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       Book a Call

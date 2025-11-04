@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { Compass, FlaskConical, Trophy, ChartLine, Clock, BookOpen, Code, Award, Star, ArrowRight, Brain, Zap, Users, MessageCircle, ExternalLink, Play, Linkedin, BadgeCheck } from 'lucide-react';
+import { Compass, FlaskConical, Trophy, ChartLine, Clock, BookOpen, Code, Award, Star, ArrowRight, Brain, Zap, Users, MessageCircle, ExternalLink, Play, Linkedin, BadgeCheck, Home, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { 
+  Breadcrumb, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbList, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '../components/ui/breadcrumb';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { ScrollableCarousel } from '../components/ScrollableCarousel';
 import { motion, AnimatePresence } from 'motion/react';
+import { SEO } from '../components/SEO';
+import { pageSEO, generateFAQSchema, generateBreadcrumbSchema } from '../data/seo';
 
 interface HowYouLearnPageProps {
   onNavigate?: (page: string) => void;
@@ -211,8 +221,72 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
     }
   ];
 
+  // FAQs for structured data
+  const faqs = [
+    {
+      question: "What is the Explore-Experience-Excel framework?",
+      answer: "Our proven learning methodology combines expert-curated content (Explore), hands-on labs and case studies (Experience), and graded assessments with industry-recognized certificates (Excel). This approach ensures both conceptual understanding and practical skills."
+    },
+    {
+      question: "What is QuCreate.ai?",
+      answer: "QuCreate.ai is our AI-powered content creation engine that automatically generates lessons, labs, and assessments from source materials. This enables us to update curriculum 10x faster than traditional methods, keeping pace with rapidly evolving AI topics."
+    },
+    {
+      question: "What is QuSkillbridge.ai?",
+      answer: "QuSkillbridge.ai is our intelligent learning management system that provides 24/7 access to courses and labs. It offers personalized learning paths, real-time progress tracking, and integrated code environments for hands-on practice."
+    },
+    {
+      question: "Can I access the labs and courses anytime?",
+      answer: "Yes! Our platform provides 24/7 access to all courses, labs, and case studies. This flexibility is perfect for busy professionals and teams across different time zones who need to learn at their own pace."
+    },
+    {
+      question: "Are the certificates recognized by employers?",
+      answer: "Yes, our certificates are recognized by top financial institutions globally. They can be exported as verifiable credentials and shared on LinkedIn or integrated into your organization's LMS."
+    }
+  ];
+
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        title={pageSEO['how-you-learn'].title}
+        description={pageSEO['how-you-learn'].description}
+        keywords={pageSEO['how-you-learn'].keywords}
+        canonicalUrl={pageSEO['how-you-learn'].canonicalUrl}
+        ogType={pageSEO['how-you-learn'].ogType}
+        structuredData={[
+          generateBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'How You Learn', url: '/how-you-learn' }
+          ]),
+          generateFAQSchema(faqs)
+        ]}
+      />
+      
+      {/* Breadcrumb Navigation */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink 
+                  onClick={() => onNavigate?.('home')}
+                  className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                >
+                  <Home className="h-3.5 w-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-gray-900">How You Learn</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative py-32 bg-gradient-to-br from-gray-50 via-blue-50 to-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDdDQkYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
@@ -232,6 +306,7 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                   size="lg" 
                   className="bg-[#007CBF] hover:bg-[#006A9C] text-white h-12 px-8"
                   onClick={() => onNavigate && onNavigate('courses')}
+                  aria-label="Navigate to courses page to view all available AI and finance courses"
                 >
                   View Courses
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -241,6 +316,7 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                   variant="outline"
                   className="border-2 border-gray-300 hover:border-[#007CBF] hover:text-[#007CBF] h-12 px-8"
                   onClick={() => onNavigate && onNavigate('enterprise')}
+                  aria-label="Navigate to enterprise page to explore custom learning paths for organizations"
                 >
                   See Enterprise Learning Paths
                 </Button>
@@ -265,7 +341,10 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                     <Badge variant="outline" className="text-[#007CBF] border-[#007CBF]">New</Badge>
                   </div>
                   <p className="text-gray-900 mb-4">Agentic AI Case Study</p>
-                  <Button className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white">
+                  <Button 
+                    className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white"
+                    aria-label="Resume learning AI Risk Management certificate program from where you left off"
+                  >
                     Resume Learning
                   </Button>
                 </CardContent>
@@ -322,8 +401,9 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                         <div className="relative h-64 overflow-hidden">
                           <ImageWithFallback
                             src={step.image}
-                            alt={step.title}
+                            alt={`${step.title} - ${step.description}`}
                             className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                           <div className="absolute inset-0 flex items-center justify-center p-8">
@@ -425,8 +505,9 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                           <div className="relative h-full min-h-[180px] hidden md:block">
                             <ImageWithFallback
                               src={platform.screenshot}
-                              alt={`${platform.name} Preview`}
+                              alt={`${platform.name} platform preview showing AI-powered learning management interface`}
                               className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                              loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white/50 to-transparent"></div>
                           </div>
@@ -449,8 +530,9 @@ export function HowYouLearnPage({ onNavigate }: HowYouLearnPageProps = {}) {
                         <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg">
                           <ImageWithFallback
                             src={platform.screenshot}
-                            alt={`${platform.name} Platform Screenshot`}
+                            alt={`${platform.name} platform screenshot showing AI-powered learning management system dashboard and features`}
                             className="w-full h-auto"
+                            loading="lazy"
                           />
                           <div className="absolute top-4 right-4">
                             <Badge className="bg-[#007CBF] text-white shadow-lg">

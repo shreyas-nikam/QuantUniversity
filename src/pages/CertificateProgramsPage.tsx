@@ -1,13 +1,25 @@
 import { useState } from 'react';
-import { Award, Clock, BookOpen, TrendingUp, Users, Target, CheckCircle, ArrowRight, Sparkles, Building2, Share2, Filter, ChevronRight } from 'lucide-react';
+import { Award, Clock, BookOpen, TrendingUp, Users, Target, CheckCircle, ArrowRight, Sparkles, Building2, Share2, Filter, ChevronRight, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '../components/ui/breadcrumb';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { getAllCertificates, Certificate } from '../data/coursesAndCertificates';
+import { SEO } from '../components/SEO';
+import { generateBreadcrumbSchema, generateFAQSchema } from '../data/seo';
+import { useAnalytics } from '../components/AnalyticsProvider';
+import { trackingIds } from '../data/analytics';
 
 interface CertificateProgramsPageProps {
   onNavigate?: (page: string) => void;
@@ -18,6 +30,7 @@ export function CertificateProgramsPage({ onNavigate }: CertificateProgramsPageP
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
   const [selectedFormat, setSelectedFormat] = useState<string>('all');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const analytics = useAnalytics();
 
   const allCertificates = getAllCertificates();
 
@@ -123,16 +136,60 @@ export function CertificateProgramsPage({ onNavigate }: CertificateProgramsPageP
     }
   };
 
+  // Prepare FAQ data for schema
+  const faqSchemaData = faqs.map(faq => ({
+    question: faq.question,
+    answer: faq.answer
+  }));
+
   return (
-    <div className="bg-white min-h-screen">
-      {/* Hero Banner */}
+    <>
+      <SEO 
+        pageKey="certificate-programs"
+        structuredData={[
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://www.quantuniversity.com' },
+            { name: 'Certificate Programs', url: 'https://www.quantuniversity.com/certificates' }
+          ]),
+          generateFAQSchema(faqSchemaData)
+        ]}
+      />
+      
+      <div className="bg-white min-h-screen">
+        {/* Breadcrumb Navigation */}
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    onClick={() => onNavigate?.('home')}
+                    className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
+                  >
+                    <Home className="h-3.5 w-3.5" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-gray-900">Certificate Programs</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </section>
+
+        {/* Hero Banner */}
       <section className="relative py-24 bg-gradient-to-br from-[#007CBF] to-[#005A8C] overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 grid grid-cols-3 opacity-10">
             <ImageWithFallback
               src="https://images.unsplash.com/photo-1752937326758-f130e633b422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjZXJ0aWZpY2F0ZSUyMGRpcGxvbWElMjBhY2hpZXZlbWVudHxlbnwxfHx8fDE3NjIxNjY2NjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-              alt="Certificate"
+              alt="Professional certificate diploma representing achievement in AI and finance education"
               className="w-full h-full object-cover"
+              loading="lazy"
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-[#007CBF]/95 to-[#005A8C]/90"></div>
@@ -564,6 +621,7 @@ export function CertificateProgramsPage({ onNavigate }: CertificateProgramsPageP
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
