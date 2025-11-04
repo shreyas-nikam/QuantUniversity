@@ -114,32 +114,44 @@ export function HomePage({ onNavigate, setSelectedArticleId, setSelectedCourseId
       title: 'The Future of AI in Risk Management: Trends for 2025',
       excerpt: 'Exploring how generative AI and agentic systems are reshaping financial risk frameworks...',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwYW5hbHl0aWNzJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc2MjA1ODI0N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      authorImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      author: 'Sri Krishnamurthy, CFA',
       date: 'Nov 1, 2025',
-      readTime: '8 min read'
+      readTime: '8 min read',
+      category: 'AI & Risk'
     },
     {
       id: 2,
       title: 'Building AI-Ready Teams: A Framework for Financial Institutions',
       excerpt: 'How leading banks are upskilling their workforce for the AI era...',
       image: 'https://images.unsplash.com/photo-1758691736722-cda1858056e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHRlYW0lMjBsZWFybmluZyUyMGNsYXNzcm9vbXxlbnwxfHx8fDE3NjIxMTA4MzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      authorImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      author: 'Sri Krishnamurthy, CFA',
       date: 'Oct 28, 2025',
-      readTime: '6 min read'
+      readTime: '6 min read',
+      category: 'Workforce Development'
     },
     {
       id: 3,
       title: 'Agentic AI: The Next Evolution in Financial Decision-Making',
       excerpt: 'Understanding autonomous AI agents and their applications in finance...',
       image: 'https://images.unsplash.com/photo-1709120395858-92f1c7c577f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwZmluYW5jZSUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzYyMTEwODM2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      authorImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      author: 'Sri Krishnamurthy, CFA',
       date: 'Oct 25, 2025',
-      readTime: '10 min read'
+      readTime: '10 min read',
+      category: 'Generative AI'
     },
     {
       id: 4,
       title: 'Model Risk Management in the Age of GenAI',
       excerpt: 'New frameworks for validating and governing generative AI models...',
       image: 'https://images.unsplash.com/photo-1599580546605-a86af98dbdb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBvZmZpY2UlMjB0ZWNobm9sb2d5fGVufDF8fHx8MTc2MjA3OTQ2OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      authorImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      author: 'Sri Krishnamurthy, CFA',
       date: 'Oct 22, 2025',
-      readTime: '7 min read'
+      readTime: '7 min read',
+      category: 'Model Risk'
     },
   ];
 
@@ -874,8 +886,8 @@ export function HomePage({ onNavigate, setSelectedArticleId, setSelectedCourseId
                       setSelectedArticleId(article.id);
                       onNavigate(page);
                     }}
-                    onHover={setHoveredCourse}
-                    isHovered={hoveredCourse === index}
+                    onHover={(id) => setHoveredCourse(typeof id === 'number' ? id : null)}
+                    isHovered={hoveredCourse === article.id}
                   />
                 ))}
               </div>

@@ -15,13 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from '../components/ui/breadcrumb';
 import { motion, useInView } from 'motion/react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
@@ -41,6 +41,8 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: Ani
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true });
 
+
+
   useEffect(() => {
     if (isInView && !hasAnimated) {
       setHasAnimated(true);
@@ -50,11 +52,11 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: Ani
       const updateCounter = () => {
         const now = Date.now();
         const progress = Math.min((now - startTime) / duration, 1);
-        
+
         // Easing function for smooth animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentCount = Math.floor(easeOutQuart * end);
-        
+
         setCount(currentCount);
 
         if (now < endTime) {
@@ -75,7 +77,11 @@ function AnimatedCounter({ end, duration = 2000, suffix = '', prefix = '' }: Ani
   );
 }
 
-export function EnterprisePage() {
+interface EnterprisePageProps {
+  onNavigate?: (page: string) => void;
+}
+
+export function EnterprisePage({ onNavigate }: EnterprisePageProps = {}) {
   const [isPrmiaOpen, setIsPrmiaOpen] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
 
@@ -257,12 +263,8 @@ export function EnterprisePage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <SEO 
-        title={pageSEO.enterprise.title}
-        description={pageSEO.enterprise.description}
-        keywords={pageSEO.enterprise.keywords}
-        canonicalUrl={pageSEO.enterprise.canonicalUrl}
-        ogType={pageSEO.enterprise.ogType}
+      <SEO
+        pageKey="enterprise"
         structuredData={[
           generateBreadcrumbSchema([
             { name: 'Home', url: '/' },
@@ -271,14 +273,14 @@ export function EnterprisePage() {
           generateFAQSchema(faqs)
         ]}
       />
-      
+
       {/* Breadcrumb Navigation */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 py-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink 
+                <BreadcrumbLink
                   onClick={() => onNavigate?.('home')}
                   className="cursor-pointer hover:text-[#007CBF] flex items-center gap-1"
                 >
@@ -300,7 +302,7 @@ export function EnterprisePage() {
       {/* Hero Section with Animated Metrics */}
       <section className="relative py-32 bg-gradient-to-br from-gray-900 via-[#006A9C] to-[#007CBF] overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-        
+
         <div className="max-w-[1440px] mx-auto px-8 lg:px-20 relative z-10">
           <div className="text-center max-w-4xl mx-auto mb-16">
             <Badge className="mb-6 bg-white/10 text-white border-white/20">
@@ -313,7 +315,7 @@ export function EnterprisePage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Dialog open={showCalendly} onOpenChange={setShowCalendly}>
                 <DialogTrigger asChild>
-                  <button 
+                  <button
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white text-[#007CBF] hover:bg-gray-100 px-8 h-14 text-lg font-medium transition-colors cursor-pointer"
                     aria-label="Open calendar dialog to schedule a strategy call with QuantUniversity enterprise team"
                   >
@@ -386,8 +388,8 @@ export function EnterprisePage() {
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-[#007CBF] px-8 rounded-lg h-14 text-lg"
                 aria-label="Download enterprise training brochure PDF with program details and pricing"
@@ -468,7 +470,7 @@ export function EnterprisePage() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-4">
-                <Button 
+                <Button
                   size="lg"
                   className="bg-[#007CBF] hover:bg-[#006A9C] text-white h-12 px-8"
                   onClick={() => window.location.href = '/certificate-programs'}
@@ -477,7 +479,7 @@ export function EnterprisePage() {
                   Explore Certificate Programs
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-2 border-[#007CBF] text-[#007CBF] hover:bg-blue-50 h-12 px-8"
@@ -706,7 +708,7 @@ export function EnterprisePage() {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-start gap-4">
                           <div className="bg-white/10 backdrop-blur-sm w-12 h-12 rounded-lg flex items-center justify-center border border-white/20 flex-shrink-0">
                             <GraduationCap className="h-6 w-6 text-white" />
@@ -738,9 +740,9 @@ export function EnterprisePage() {
                           <div className="text-xl text-white/90">Member Discount</div>
                           <div className="text-sm text-white/60 mt-2">On all courses & certifications</div>
                         </div>
-                        
+
                         <div className="h-px bg-white/20 my-6"></div>
-                        
+
                         <div className="space-y-3">
                           <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                             <span className="text-white">CRL Credits Available</span>
@@ -756,8 +758,8 @@ export function EnterprisePage() {
                           </div>
                         </div>
 
-                        <Button 
-                          variant="secondary" 
+                        <Button
+                          variant="secondary"
                           className="w-full mt-6 bg-white text-[#007CBF] hover:bg-gray-100"
                         >
                           Claim PRMIA Discount
@@ -820,8 +822,8 @@ export function EnterprisePage() {
                   <div className="text-white/80 text-sm">Time Saved</div>
                 </div>
               </div>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="bg-white text-[#007CBF] hover:bg-gray-100 w-full"
               >
                 Read Full Case Study
@@ -877,8 +879,8 @@ export function EnterprisePage() {
                 </div>
               </div>
 
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="bg-white text-[#007CBF] hover:bg-gray-100 w-full"
               >
                 View Certificate Programs
@@ -974,7 +976,7 @@ export function EnterprisePage() {
                     <label className="block text-sm text-gray-700 mb-2">
                       Name *
                     </label>
-                    <Input 
+                    <Input
                       placeholder="John Doe"
                       className="border-gray-300"
                     />
@@ -983,7 +985,7 @@ export function EnterprisePage() {
                     <label className="block text-sm text-gray-700 mb-2">
                       Organization *
                     </label>
-                    <Input 
+                    <Input
                       placeholder="Your Company"
                       className="border-gray-300"
                     />
@@ -995,7 +997,7 @@ export function EnterprisePage() {
                     <label className="block text-sm text-gray-700 mb-2">
                       Work Email *
                     </label>
-                    <Input 
+                    <Input
                       type="email"
                       placeholder="john@company.com"
                       className="border-gray-300"
@@ -1041,7 +1043,7 @@ export function EnterprisePage() {
                   <label className="block text-sm text-gray-700 mb-2">
                     Message
                   </label>
-                  <Textarea 
+                  <Textarea
                     placeholder="Tell us about your training needs..."
                     rows={4}
                     className="border-gray-300"
@@ -1049,7 +1051,7 @@ export function EnterprisePage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     type="submit"
                     size="lg"
                     className="flex-1 bg-[#007CBF] hover:bg-[#006A9C] text-white h-12"

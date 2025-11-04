@@ -71,7 +71,7 @@ export default function App() {
       case 'contact':
         return <ContactPage onNavigate={handleNavigate} />;
       default:
-        return <HomePage onNavigate={handleNavigate} />;
+        return <HomePage onNavigate={handleNavigate} setSelectedArticleId={setSelectedArticleId} setSelectedCourseId={setSelectedCourseId} />;
     }
   };
 
