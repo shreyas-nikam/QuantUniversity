@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Calendar, Download, Play, Mic, FileText, Radio, Newspaper, Globe, Brain, TrendingUp, Shield, Rocket, Users, ArrowRight, ExternalLink, MapPin, Star, Quote, Mail, Phone, ChevronDown, Building2, Upload, Home, ChevronRight } from 'lucide-react';
+import { Calendar, Download, Play, Mic, FileText, Radio, Newspaper, Globe, Brain, TrendingUp, Shield, Rocket, Users, ArrowRight, ExternalLink, MapPin, Star, Quote, Mail, Phone, ChevronDown, Building2, Upload, Home, ChevronRight, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { 
@@ -35,6 +36,104 @@ interface SpeakingMediaPageProps {
 export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    organization: '',
+    email: '',
+    phone: '',
+    eventType: '',
+    preferredDate: '',
+    topicOfInterest: '',
+    audienceSize: '',
+    additionalDetails: '',
+    eventRfp: null as File | null
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name: string) => (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({
+      ...prev,
+      eventRfp: file
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('organization', formData.organization);
+      formDataToSend.append('email', formData.email);
+      if (formData.phone) formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('event_type', formData.eventType);
+      if (formData.preferredDate) formDataToSend.append('preferred_date', formData.preferredDate);
+      if (formData.topicOfInterest) formDataToSend.append('topic_of_interest', formData.topicOfInterest);
+      if (formData.audienceSize) formDataToSend.append('expected_audience_size', formData.audienceSize);
+      if (formData.additionalDetails) formDataToSend.append('additional_details', formData.additionalDetails);
+      if (formData.eventRfp) formDataToSend.append('event_rfp', formData.eventRfp);
+
+      const response = await fetch('http://localhost:8003/post_speaking_interest', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      setSubmitStatus('success');
+      // Reset form
+      setFormData({
+        name: '',
+        organization: '',
+        email: '',
+        phone: '',
+        eventType: '',
+        preferredDate: '',
+        topicOfInterest: '',
+        audienceSize: '',
+        additionalDetails: '',
+        eventRfp: null
+      });
+      
+      // Show success message
+      toast.success('Thank you for your booking request!', {
+        description: "We'll get back to you within 24 hours.",
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus('error');
+      toast.error('Failed to submit booking request', {
+        description: 'Please try again or email us directly at speaking@quantuniversity.com',
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const topics = [
     {
@@ -233,11 +332,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
   return (
     <div className="bg-white min-h-screen">
       <SEO 
-        title={pageSEO['speaking-media'].title}
-        description={pageSEO['speaking-media'].description}
-        keywords={pageSEO['speaking-media'].keywords}
-        canonicalUrl={pageSEO['speaking-media'].canonicalUrl}
-        ogType={pageSEO['speaking-media'].ogType}
+        pageKey="speaking-media"
         structuredData={[breadcrumbSchema, generateFAQSchema(faqs)]}
       />
       
@@ -539,7 +634,7 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                       <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                         <ImageWithFallback
                           src={testimonial.image}
-                          alt={`${testimonial.author}, ${testimonial.role} at ${testimonial.organization}`}
+                          alt={`${testimonial.author}, ${testimonial.role} at ${testimonial.company}`}
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
@@ -578,15 +673,19 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
 
           <Card className="border-2 border-white/20">
             <CardContent className="p-8">
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm text-gray-700 mb-2">
                       Your Name *
                     </label>
                     <Input 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       placeholder="John Doe"
                       className="border-gray-300"
+                      required
                     />
                   </div>
                   <div>
@@ -594,8 +693,12 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                       Organization *
                     </label>
                     <Input 
+                      name="organization"
+                      value={formData.organization}
+                      onChange={handleInputChange}
                       placeholder="Company or Institution"
                       className="border-gray-300"
+                      required
                     />
                   </div>
                 </div>
@@ -606,9 +709,13 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                       Email *
                     </label>
                     <Input 
+                      name="email"
                       type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder="john@company.com"
                       className="border-gray-300"
+                      required
                     />
                   </div>
                   <div>
@@ -616,7 +723,10 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                       Phone
                     </label>
                     <Input 
+                      name="phone"
                       type="tel"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       placeholder="+1 (555) 123-4567"
                       className="border-gray-300"
                     />
@@ -628,7 +738,11 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     <label className="block text-sm text-gray-700 mb-2">
                       Event Type *
                     </label>
-                    <Select>
+                    <Select 
+                      required
+                      value={formData.eventType}
+                      onValueChange={handleSelectChange('eventType')}
+                    >
                       <SelectTrigger className="border-gray-300">
                         <SelectValue placeholder="Select event type" />
                       </SelectTrigger>
@@ -648,7 +762,10 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                       Preferred Date
                     </label>
                     <Input 
+                      name="preferredDate"
                       type="date"
+                      value={formData.preferredDate}
+                      onChange={handleInputChange}
                       className="border-gray-300"
                     />
                   </div>
@@ -658,7 +775,10 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                   <label className="block text-sm text-gray-700 mb-2">
                     Topic of Interest
                   </label>
-                  <Select>
+                  <Select
+                    value={formData.topicOfInterest}
+                    onValueChange={handleSelectChange('topicOfInterest')}
+                  >
                     <SelectTrigger className="border-gray-300">
                       <SelectValue placeholder="Select a topic" />
                     </SelectTrigger>
@@ -676,7 +796,10 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                   <label className="block text-sm text-gray-700 mb-2">
                     Expected Audience Size
                   </label>
-                  <Select>
+                  <Select
+                    value={formData.audienceSize}
+                    onValueChange={handleSelectChange('audienceSize')}
+                  >
                     <SelectTrigger className="border-gray-300">
                       <SelectValue placeholder="Select audience size" />
                     </SelectTrigger>
@@ -694,6 +817,9 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                     Additional Details
                   </label>
                   <Textarea 
+                    name="additionalDetails"
+                    value={formData.additionalDetails}
+                    onChange={handleInputChange}
                     placeholder="Tell us about your event, audience, and what you'd like Sri to cover..."
                     rows={4}
                     className="border-gray-300"
@@ -704,20 +830,48 @@ export function SpeakingMediaPage({ onNavigate }: SpeakingMediaPageProps = {}) {
                   <label className="block text-sm text-gray-700 mb-2">
                     Upload Event RFP (Optional)
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#007CBF] transition-colors cursor-pointer">
+                  <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#007CBF] transition-colors cursor-pointer block">
+                    <input 
+                      type="file"
+                      name="eventRfp"
+                      onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                    />
                     <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
+                    <p className="text-sm text-gray-600">
+                      {formData.eventRfp ? formData.eventRfp.name : 'Click to upload or drag and drop'}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">PDF, DOC, or DOCX (max 10MB)</p>
-                  </div>
+                  </label>
                 </div>
+
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <p className="text-sm text-green-700">
+                      Thank you! Your booking request has been submitted successfully.
+                    </p>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+                    <span className="text-red-600">⚠️</span>
+                    <p className="text-sm text-red-700">
+                      There was an error. Please try again or email us directly at speaking@quantuniversity.com
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   <Button 
                     type="submit"
                     size="lg"
-                    className="flex-1 bg-[#007CBF] hover:bg-[#006A9C] text-white h-12"
+                    className="flex-1 bg-[#007CBF] hover:bg-[#006A9C] text-white h-12 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isSubmitting}
                   >
-                    Submit Booking Request
+                    {isSubmitting ? 'Sending...' : 'Submit Booking Request'}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   <button

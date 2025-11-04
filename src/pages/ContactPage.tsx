@@ -5,6 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
+import { toast } from 'sonner';
 import {
   Accordion,
   AccordionContent,
@@ -37,6 +38,93 @@ interface ContactPageProps {
 export function ContactPage({ onNavigate }: ContactPageProps = {}) {
   const [selectedInquiryType, setSelectedInquiryType] = useState('');
   const [showCalendly, setShowCalendly] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    organization: '',
+    phone: '',
+    inquiryType: '',
+    course: '',
+    industry: '',
+    message: '',
+    consent: false
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }));
+  };
+
+  const handleSelectChange = (name: string) => (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('interest_in', formData.inquiryType);
+      formDataToSend.append('message', formData.message);
+      formDataToSend.append('organization', formData.organization);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('course', formData.course);
+      formDataToSend.append('industry', formData.industry);
+      formDataToSend.append('receive_updates', formData.consent.toString());
+
+      const response = await fetch('http://localhost:8003/post_contact_interest', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      setSubmitStatus('success');
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        organization: '',
+        phone: '',
+        inquiryType: '',
+        course: '',
+        industry: '',
+        message: '',
+        consent: false
+      });
+      
+      // Show success message
+      toast.success('Thank you for your message!', {
+        description: "We'll get back to you within 24 hours.",
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus('error');
+      toast.error('Failed to send message', {
+        description: 'Please try again or email us directly at info@quantuniversity.com',
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const contactMethods = [
     {
@@ -300,13 +388,16 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
 
           <Card className="border-2 border-gray-200 shadow-xl bg-white">
             <CardContent className="p-8">
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Name *
                     </label>
                     <Input 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       placeholder="John Doe"
                       className="border-gray-300"
                       required
@@ -317,7 +408,10 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                       Email *
                     </label>
                     <Input 
+                      name="email"
                       type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder="john@company.com"
                       className="border-gray-300"
                       required
@@ -331,6 +425,9 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                       Organization
                     </label>
                     <Input 
+                      name="organization"
+                      value={formData.organization}
+                      onChange={handleInputChange}
                       placeholder="Your Company (Optional)"
                       className="border-gray-300"
                     />
@@ -340,7 +437,10 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                       Phone
                     </label>
                     <Input 
+                      name="phone"
                       type="tel"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       placeholder="+1 (555) 000-0000"
                       className="border-gray-300"
                     />
@@ -352,7 +452,11 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       I'm interested in... *
                     </label>
-                    <Select required>
+                    <Select 
+                      required 
+                      value={formData.inquiryType}
+                      onValueChange={handleSelectChange('inquiryType')}
+                    >
                       <SelectTrigger className="border-gray-300">
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
@@ -371,7 +475,10 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Which course interests you?
                     </label>
-                    <Select>
+                    <Select
+                      value={formData.course}
+                      onValueChange={handleSelectChange('course')}
+                    >
                       <SelectTrigger className="border-gray-300">
                         <SelectValue placeholder="Select a course" />
                       </SelectTrigger>
@@ -390,7 +497,10 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Industry / Sector
                   </label>
-                  <Select>
+                  <Select
+                    value={formData.industry}
+                    onValueChange={handleSelectChange('industry')}
+                  >
                     <SelectTrigger className="border-gray-300">
                       <SelectValue placeholder="Select your industry" />
                     </SelectTrigger>
@@ -409,6 +519,9 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                     Message *
                   </label>
                   <Textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     placeholder="Tell us more about what you're looking for..."
                     rows={6}
                     className="border-gray-300"
@@ -420,6 +533,9 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input 
                       type="checkbox" 
+                      name="consent"
+                      checked={formData.consent}
+                      onChange={handleInputChange}
                       className="mt-1"
                       required
                     />
@@ -432,12 +548,31 @@ export function ContactPage({ onNavigate }: ContactPageProps = {}) {
                 <Button 
                   type="submit"
                   size="lg"
-                  className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white h-14 text-lg"
+                  className="w-full bg-[#007CBF] hover:bg-[#006A9C] text-white h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Submit contact form to send your message to QuantUniversity"
+                  disabled={isSubmitting}
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                   <Send className="ml-2 h-5 w-5" />
                 </Button>
+
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <p className="text-sm text-green-700">
+                      Thank you! Your message has been sent successfully.
+                    </p>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+                    <span className="text-red-600">⚠️</span>
+                    <p className="text-sm text-red-700">
+                      There was an error. Please try again or email us directly.
+                    </p>
+                  </div>
+                )}
 
                 <p className="text-sm text-gray-500 text-center">
                   We'll respond within 24 hours during business days

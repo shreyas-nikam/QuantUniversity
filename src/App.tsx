@@ -19,6 +19,7 @@ import { QuantFinanceFoundationsCertPage } from './pages/QuantFinanceFoundations
 import { ResponsibleGenAICertPage } from './pages/ResponsibleGenAICertPage';
 import { AnalyticsProvider } from './components/AnalyticsProvider';
 import { MLTradingFinanceCourseDetailPage } from './pages/MLTradingFinanceCourseDetailPage';
+import { Toaster } from './components/ui/sonner';
 
 type PageType = 'home' | 'courses' | 'how-you-learn' | 'enterprise' | 'speaking-media' | 'thought-leadership' | 'whitepapers' | 'about' | 'contact' | 'blog-article' | 'course-detail' | 'intro-genai-course' | 'certificate-programs' | 'ai-risk-management' | 'quant-finance-foundations' | 'responsible-genai-cert' | 'ml-trading-finance';
 
@@ -90,6 +91,7 @@ export default function App() {
           {renderPage()}
         </main>
         <Footer onNavigate={handleNavigate} />
+        <Toaster />
       </div>
     </AnalyticsProvider>
   );
